@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bantubencana.controller.RegisterController">
+   <children>
+      <VBox alignment="CENTER" layoutX="250.0" layoutY="100.0" prefHeight="400.0" prefWidth="300.0" spacing="15.0" style="-fx-border-color: #cccccc; -fx-border-radius: 5; -fx-padding: 20;">
+         <children>
+            <Label text="Register">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <TextField fx:id="nameField" promptText="Nama Lengkap" />
+            <TextField fx:id="emailField" promptText="Email" />
+            <PasswordField fx:id="passwordField" promptText="Password" />
+            <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" />
+            <ComboBox fx:id="roleComboBox" prefWidth="200.0" promptText="Pilih Peran Anda" />
+            <Button onAction="#handleRegister" prefWidth="200.0" text="Register" />
+            <Label text="Sudah punya akun?" />
+            <Button onAction="#goToLogin" prefWidth="200.0" text="Login" />
+            <Label fx:id="errorMessageLabel" textFill="RED" wrapText="true" />
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>
