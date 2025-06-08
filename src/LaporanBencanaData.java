@@ -1,57 +1,80 @@
-public class LaporanBencanaData {
+import java.io.Serializable;
+
+public class LaporanBencanaData implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private String jenisBencana;
-    private String lokasiBencana;
+    private String lokasi;
     private String deskripsi;
     private String tingkatKeparahan;
     private String jumlahKorban;
-    private String tanggalLaporan;
     
-    public LaporanBencanaData() {
-        this.tanggalLaporan = java.time.LocalDateTime.now().toString();
-    }
-    
-    public LaporanBencanaData(String jenisBencana, String lokasiBencana, String deskripsi, 
-                             String tingkatKeparahan, String jumlahKorban) {
+    public LaporanBencanaData(String jenisBencana, String lokasi, String deskripsi, String tingkatKeparahan, String jumlahKorban) {
         this.jenisBencana = jenisBencana;
-        this.lokasiBencana = lokasiBencana;
+        this.lokasi = lokasi;
         this.deskripsi = deskripsi;
         this.tingkatKeparahan = tingkatKeparahan;
         this.jumlahKorban = jumlahKorban;
-        this.tanggalLaporan = java.time.LocalDateTime.now().toString();
     }
     
-    // Getters and Setters
-    public String getJenisBencana() { return jenisBencana; }
-    public void setJenisBencana(String jenisBencana) { this.jenisBencana = jenisBencana; }
+    public String getJenisBencana() {
+        return jenisBencana;
+    }
     
-    public String getLokasiBencana() { return lokasiBencana; }
-    public void setLokasiBencana(String lokasiBencana) { this.lokasiBencana = lokasiBencana; }
+    public void setJenisBencana(String jenisBencana) {
+        this.jenisBencana = jenisBencana;
+    }
     
-    public String getDeskripsi() { return deskripsi; }
-    public void setDeskripsi(String deskripsi) { this.deskripsi = deskripsi; }
+    public String getLokasi() {
+        return lokasi;
+    }
     
-    public String getTingkatKeparahan() { return tingkatKeparahan; }
-    public void setTingkatKeparahan(String tingkatKeparahan) { this.tingkatKeparahan = tingkatKeparahan; }
+    public void setLokasi(String lokasi) {
+        this.lokasi = lokasi;
+    }
     
-    public String getJumlahKorban() { return jumlahKorban; }
-    public void setJumlahKorban(String jumlahKorban) { this.jumlahKorban = jumlahKorban; }
+    // Method untuk kompatibilitas dengan Feedback.java
+    public String getLokasiBencana() {
+        return lokasi;
+    }
     
-    public String getTanggalLaporan() { return tanggalLaporan; }
-    public void setTanggalLaporan(String tanggalLaporan) { this.tanggalLaporan = tanggalLaporan; }
+    public String getDeskripsi() {
+        return deskripsi;
+    }
     
-    // Method untuk mendapatkan display name untuk dropdown
+    public void setDeskripsi(String deskripsi) {
+        this.deskripsi = deskripsi;
+    }
+    
+    public String getTingkatKeparahan() {
+        return tingkatKeparahan;
+    }
+    
+    public void setTingkatKeparahan(String tingkatKeparahan) {
+        this.tingkatKeparahan = tingkatKeparahan;
+    }
+    
+    public String getJumlahKorban() {
+        return jumlahKorban;
+    }
+    
+    public void setJumlahKorban(String jumlahKorban) {
+        this.jumlahKorban = jumlahKorban;
+    }
+    
+    // Method untuk menampilkan nama display yang digunakan di ComboBox
     public String getDisplayName() {
-        return jenisBencana + " - " + lokasiBencana + " (" + tingkatKeparahan + ")";
+        return jenisBencana + " - " + lokasi + " (" + tingkatKeparahan + ")";
     }
     
     @Override
     public String toString() {
         return "LaporanBencanaData{" +
                 "jenisBencana='" + jenisBencana + '\'' +
-                ", lokasiBencana='" + lokasiBencana + '\'' +
+                ", lokasi='" + lokasi + '\'' +
+                ", deskripsi='" + deskripsi + '\'' +
                 ", tingkatKeparahan='" + tingkatKeparahan + '\'' +
                 ", jumlahKorban='" + jumlahKorban + '\'' +
-                ", tanggalLaporan='" + tanggalLaporan + '\'' +
                 '}';
     }
 }

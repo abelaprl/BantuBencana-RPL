@@ -1,301 +1,283 @@
-import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import java.util.Optional;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.List;
 
-public class DatabaseViewer extends Application {
-    
-    @Override
-    public void start(Stage primaryStage) {
-        // Judul
-        Text title = new Text("Database Viewer - Bantuan Bencana");
-        title.setFont(Font.font("Arial", 20));
-        title.setStyle("-fx-font-weight: bold;");
+public class DatabaseViewer {
+    private Stage stage;
+    private TabPane tabPane;
+    private VBox feedbackContent;
+    private VBox laporanContent;
+
+    public DatabaseViewer() {
+        stage = new Stage();
+        stage.setTitle("Database Viewer");
         
-        // Tab Pane untuk memisahkan database
-        TabPane tabPane = new TabPane();
+        tabPane = new TabPane();
         
-        // Tab untuk Database Feedback
-        Tab feedbackTab = new Tab("Database Feedback");
+        // Tab untuk Feedback
+        Tab feedbackTab = new Tab("Feedback");
         feedbackTab.setClosable(false);
-        VBox feedbackContent = createFeedbackDatabaseView();
-        feedbackTab.setContent(feedbackContent);
+        feedbackContent = new VBox(10);
+        feedbackContent.setPadding(new Insets(10));
+        ScrollPane feedbackScrollPane = new ScrollPane(feedbackContent);
+        feedbackScrollPane.setFitToWidth(true);
+        feedbackTab.setContent(feedbackScrollPane);
         
-        // Tab untuk Database Laporan Bencana
-        Tab laporanTab = new Tab("Database Laporan Bencana");
+        // Tab untuk Laporan Bencana
+        Tab laporanTab = new Tab("Laporan Bencana");
         laporanTab.setClosable(false);
-        VBox laporanContent = createLaporanDatabaseView();
-        laporanTab.setContent(laporanContent);
+        laporanContent = new VBox(10);
+        laporanContent.setPadding(new Insets(10));
+        ScrollPane laporanScrollPane = new ScrollPane(laporanContent);
+        laporanScrollPane.setFitToWidth(true);
+        laporanTab.setContent(laporanScrollPane);
         
         tabPane.getTabs().addAll(feedbackTab, laporanTab);
         
-        // Tombol refresh
-        Button refreshButton = new Button("Refresh Data");
-        refreshButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
-        refreshButton.setOnAction(e -> {
-            // Refresh kedua tab
-            feedbackTab.setContent(createFeedbackDatabaseView());
-            laporanTab.setContent(createLaporanDatabaseView());
-        });
-        
-        // Tombol tutup
-        Button closeButton = new Button("Tutup");
-        closeButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;");
-        closeButton.setOnAction(e -> primaryStage.close());
-        
-        HBox buttonLayout = new HBox(10);
-        buttonLayout.getChildren().addAll(refreshButton, closeButton);
-        
-        // Layout utama
-        VBox mainLayout = new VBox(15);
-        mainLayout.setPadding(new Insets(20));
-        mainLayout.getChildren().addAll(title, tabPane, buttonLayout);
-        
-        Scene scene = new Scene(mainLayout, 900, 600);
-        primaryStage.setTitle("Database Viewer");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Scene scene = new Scene(tabPane, 800, 600);
+        stage.setScene(scene);
     }
     
-    private VBox createFeedbackDatabaseView() {
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(10));
+    public void show() {
+        refreshData();
+        stage.show();
+    }
+    
+    public void refreshData() {
+        Platform.runLater(() -> {
+            refreshFeedbackData();
+            refreshLaporanData();
+        });
+    }
+    
+    private void refreshFeedbackData() {
+        feedbackContent.getChildren().clear();
         
-        Label countLabel = new Label("Total Feedback: " + Dashboard.getAllFeedback().size());
-        countLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        List<FeedbackData> feedbackList = Dashboard.getAllFeedback();
         
-        if (Dashboard.getAllFeedback().isEmpty()) {
-            Label emptyLabel = new Label("Belum ada data feedback.");
-            emptyLabel.setStyle("-fx-font-style: italic;");
-            content.getChildren().addAll(countLabel, emptyLabel);
-        } else {
-            ScrollPane scrollPane = new ScrollPane();
-            VBox feedbackList = new VBox(10);
-            
-            for (int i = 0; i < Dashboard.getAllFeedback().size(); i++) {
-                FeedbackData feedback = Dashboard.getAllFeedback().get(i);
-                VBox feedbackCard = createFeedbackCard(feedback, i);
-                feedbackList.getChildren().add(feedbackCard);
-            }
-            
-            scrollPane.setContent(feedbackList);
-            scrollPane.setFitToWidth(true);
-            scrollPane.setPrefHeight(400);
-            
-            content.getChildren().addAll(countLabel, scrollPane);
+        if (feedbackList.isEmpty()) {
+            Label emptyLabel = new Label("Tidak ada data feedback.");
+            emptyLabel.setStyle("-fx-font-size: 14px;");
+            feedbackContent.getChildren().add(emptyLabel);
+            return;
         }
         
-        return content;
+        for (int i = 0; i < feedbackList.size(); i++) {
+            FeedbackData feedback = feedbackList.get(i);
+            VBox feedbackBox = createFeedbackBox(feedback, i);
+            feedbackContent.getChildren().add(feedbackBox);
+        }
     }
     
-    private VBox createLaporanDatabaseView() {
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(10));
+    private VBox createFeedbackBox(FeedbackData feedback, int index) {
+        VBox box = new VBox(10);
+        box.setPadding(new Insets(15));
+        box.setStyle("-fx-background-color: #f5f5f5; -fx-background-radius: 5;");
         
-        Label countLabel = new Label("Total Laporan Bencana: " + Dashboard.getAllLaporanBencana().size());
-        countLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        // Header dengan informasi utama
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
         
-        if (Dashboard.getAllLaporanBencana().isEmpty()) {
-            Label emptyLabel = new Label("Belum ada data laporan bencana.");
-            emptyLabel.setStyle("-fx-font-style: italic;");
-            content.getChildren().addAll(countLabel, emptyLabel);
-        } else {
-            ScrollPane scrollPane = new ScrollPane();
-            VBox laporanList = new VBox(10);
-            
-            for (int i = 0; i < Dashboard.getAllLaporanBencana().size(); i++) {
-                LaporanBencanaData laporan = Dashboard.getAllLaporanBencana().get(i);
-                VBox laporanCard = createLaporanCard(laporan, i);
-                laporanList.getChildren().add(laporanCard);
-            }
-            
-            scrollPane.setContent(laporanList);
-            scrollPane.setFitToWidth(true);
-            scrollPane.setPrefHeight(400);
-            
-            content.getChildren().addAll(countLabel, scrollPane);
+        Label titleLabel = new Label(feedback.getLaporanBencana());
+        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        
+        Label emailLabel = new Label("(" + feedback.getUserEmail() + ")");
+        emailLabel.setFont(Font.font("System", 12));
+        emailLabel.setTextFill(Color.GRAY);
+        
+        header.getChildren().addAll(titleLabel, emailLabel);
+        
+        // Informasi detail
+        VBox detailsBox = new VBox(5);
+        detailsBox.getChildren().addAll(
+            new Label("Jenis Bencana: " + feedback.getJenisBencana()),
+            new Label("Lokasi: " + feedback.getLokasiLaporan()),
+            new Label("Waktu Laporan: " + feedback.getTimestamp())
+        );
+        
+        // Rating section
+        VBox ratingsBox = new VBox(5);
+        ratingsBox.getChildren().addAll(
+            createRatingDisplay("Penanganan", feedback.getRatingPenanganan()),
+            createRatingDisplay("Kinerja Relawan", feedback.getRatingKinerjaRelawan()),
+            createRatingDisplay("Alokasi Donasi", feedback.getRatingAlokasiDonasi()),
+            createRatingDisplay("Pengalaman Buruk", feedback.getRatingPengalamanBuruk())
+        );
+        
+        // Feedback text section
+        VBox feedbackTextBox = new VBox(5);
+        
+        if (feedback.getFeedbackPenanganan() != null && !feedback.getFeedbackPenanganan().isEmpty()) {
+            feedbackTextBox.getChildren().add(createFeedbackTextSection("Penanganan", feedback.getFeedbackPenanganan()));
         }
         
-        return content;
-    }
-    
-    private VBox createFeedbackCard(FeedbackData feedback, int index) {
-        VBox card = new VBox(5);
-        card.setStyle("-fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #f9f9f9;");
+        if (feedback.getFeedbackKinerjaRelawan() != null && !feedback.getFeedbackKinerjaRelawan().isEmpty()) {
+            feedbackTextBox.getChildren().add(createFeedbackTextSection("Kinerja Relawan", feedback.getFeedbackKinerjaRelawan()));
+        }
         
-        // Header dengan tombol hapus
-        HBox headerBox = new HBox();
-        headerBox.setSpacing(10);
+        if (feedback.getFeedbackAlokasiDonasi() != null && !feedback.getFeedbackAlokasiDonasi().isEmpty()) {
+            feedbackTextBox.getChildren().add(createFeedbackTextSection("Alokasi Donasi", feedback.getFeedbackAlokasiDonasi()));
+        }
         
-        Label titleLabel = new Label("Feedback #" + (index + 1));
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        if (feedback.getFeedbackPengalamanBuruk() != null && !feedback.getFeedbackPengalamanBuruk().isEmpty()) {
+            feedbackTextBox.getChildren().add(createFeedbackTextSection("Pengalaman Buruk", feedback.getFeedbackPengalamanBuruk()));
+        }
         
-        Button deleteButton = new Button("🗑️ Hapus");
-        deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 12px;");
-        deleteButton.setOnAction(e -> {
-            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmAlert.setTitle("Konfirmasi Hapus");
-            confirmAlert.setHeaderText("Hapus Feedback #" + (index + 1));
-            confirmAlert.setContentText("Apakah Anda yakin ingin menghapus feedback ini?");
-            
-            Optional<ButtonType> result = confirmAlert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                Dashboard.removeFeedbackFromDatabase(index);
+        if (feedback.getEvaluasiTambahan() != null && !feedback.getEvaluasiTambahan().isEmpty()) {
+            feedbackTextBox.getChildren().add(createFeedbackTextSection("Evaluasi Tambahan", feedback.getEvaluasiTambahan()));
+        }
+        
+        // Media pendukung section
+        VBox mediaBox = new VBox(5);
+        if (feedback.getMediaPendukung() != null) {
+            File mediaFile = feedback.getMediaPendukung();
+            if (mediaFile.exists()) {
+                Label mediaLabel = new Label("Media Pendukung: " + mediaFile.getName());
+                mediaBox.getChildren().add(mediaLabel);
                 
-                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                successAlert.setTitle("Feedback Dihapus");
-                successAlert.setHeaderText(null);
-                successAlert.setContentText("Feedback berhasil dihapus dari database!");
-                successAlert.showAndWait();
-                
-                // Refresh tampilan
-                Stage stage = (Stage) deleteButton.getScene().getWindow();
-                stage.close();
-                try {
-                    DatabaseViewer newViewer = new DatabaseViewer();
-                    Stage newStage = new Stage();
-                    newViewer.start(newStage);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                // Menampilkan gambar jika file adalah jpg atau png
+                String fileName = mediaFile.getName().toLowerCase();
+                if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png")) {
+                    try {
+                        Image image = new Image(new FileInputStream(mediaFile));
+                        ImageView imageView = new ImageView(image);
+                        imageView.setFitWidth(300);
+                        imageView.setPreserveRatio(true);
+                        mediaBox.getChildren().add(imageView);
+                    } catch (FileNotFoundException e) {
+                        Label errorLabel = new Label("Tidak dapat menampilkan gambar: " + e.getMessage());
+                        errorLabel.setTextFill(Color.RED);
+                        mediaBox.getChildren().add(errorLabel);
+                    }
                 }
+            } else {
+                Label errorLabel = new Label("File tidak ditemukan: " + mediaFile.getAbsolutePath());
+                errorLabel.setTextFill(Color.RED);
+                mediaBox.getChildren().add(errorLabel);
             }
-        });
+        }
         
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        headerBox.getChildren().addAll(titleLabel, spacer, deleteButton);
+        // Rata-rata rating
+        HBox averageBox = new HBox(10);
+        averageBox.setAlignment(Pos.CENTER_LEFT);
         
-        Label infoLabel = new Label(
-            "Laporan: " + (feedback.getLaporanBencana() != null ? feedback.getLaporanBencana() : "N/A") + "\n" +
-            "Jenis: " + (feedback.getJenisBencana() != null ? feedback.getJenisBencana() : "N/A") + "\n" +
-            "Lokasi: " + (feedback.getLokasiLaporan() != null ? feedback.getLokasiLaporan() : "N/A")
-        );
+        Label averageLabel = new Label("Rata-rata Rating: ");
+        averageLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         
-        // Membuat tampilan rating dengan bintang yang lebih besar
-        HBox ratingBox = new HBox(15);
-        ratingBox.setPadding(new Insets(5, 0, 5, 0));
+        Text averageValue = new Text(String.format("%.1f", feedback.getAverageRating()));
+        averageValue.setFont(Font.font("System", FontWeight.BOLD, 14));
         
-        // Rating Penanganan
-        VBox penangananBox = createRatingDisplay("Penanganan", feedback.getRatingPenanganan());
+        averageBox.getChildren().addAll(averageLabel, averageValue);
         
-        // Rating Relawan
-        VBox relawanBox = createRatingDisplay("Relawan", feedback.getRatingKinerjaRelawan());
+        // Menggabungkan semua komponen
+        box.getChildren().addAll(header, new Separator(), detailsBox, new Separator(), 
+                                ratingsBox, new Separator(), feedbackTextBox);
         
-        // Rating Donasi
-        VBox donasiBox = createRatingDisplay("Donasi", feedback.getRatingAlokasiDonasi());
+        // Tambahkan media box jika ada media pendukung
+        if (feedback.getMediaPendukung() != null) {
+            box.getChildren().addAll(new Separator(), mediaBox);
+        }
         
-        // Rating Pengalaman
-        VBox pengalamanBox = createRatingDisplay("Pengalaman", feedback.getRatingPengalamanBuruk());
-        
-        ratingBox.getChildren().addAll(penangananBox, relawanBox, donasiBox, pengalamanBox);
-        
-        Label mediaLabel = new Label("Media: " + 
-            (feedback.getMediaPendukung() != null ? feedback.getMediaPendukung().getName() : "Tidak ada"));
-        
-        card.getChildren().addAll(headerBox, infoLabel, ratingBox, mediaLabel);
-        return card;
-    }
-    
-    private VBox createLaporanCard(LaporanBencanaData laporan, int index) {
-        VBox card = new VBox(5);
-        card.setStyle("-fx-border-color: #ddd; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #f0f8ff;");
-        
-        // Header dengan tombol hapus
-        HBox headerBox = new HBox();
-        headerBox.setSpacing(10);
-        
-        Label titleLabel = new Label("Laporan #" + (index + 1));
-        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
-        
-        Button deleteButton = new Button("🗑️ Hapus");
-        deleteButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 12px;");
-        deleteButton.setOnAction(e -> {
-            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmAlert.setTitle("Konfirmasi Hapus");
-            confirmAlert.setHeaderText("Hapus Laporan #" + (index + 1));
-            confirmAlert.setContentText("Apakah Anda yakin ingin menghapus laporan bencana ini?\n\nPerhatian: Feedback yang terkait dengan laporan ini mungkin akan terpengaruh!");
-            
-            Optional<ButtonType> result = confirmAlert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                Dashboard.removeLaporanBencanaFromDatabase(index);
-                
-                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                successAlert.setTitle("Laporan Dihapus");
-                successAlert.setHeaderText(null);
-                successAlert.setContentText("Laporan bencana berhasil dihapus dari database!");
-                successAlert.showAndWait();
-                
-                // Refresh tampilan
-                Stage stage = (Stage) deleteButton.getScene().getWindow();
-                stage.close();
-                try {
-                    DatabaseViewer newViewer = new DatabaseViewer();
-                    Stage newStage = new Stage();
-                    newViewer.start(newStage);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-        
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        headerBox.getChildren().addAll(titleLabel, spacer, deleteButton);
-        
-        Label infoLabel = new Label(
-            "Jenis: " + laporan.getJenisBencana() + "\n" +
-            "Lokasi: " + laporan.getLokasiBencana() + "\n" +
-            "Tingkat: " + laporan.getTingkatKeparahan() + "\n" +
-            "Korban: " + (laporan.getJumlahKorban().isEmpty() ? "Tidak ada data" : laporan.getJumlahKorban())
-        );
-        
-        Label deskripsiLabel = new Label("Deskripsi: " + 
-            (laporan.getDeskripsi().length() > 100 ? 
-             laporan.getDeskripsi().substring(0, 100) + "..." : 
-             laporan.getDeskripsi()));
-        deskripsiLabel.setWrapText(true);
-        
-        card.getChildren().addAll(headerBox, infoLabel, deskripsiLabel);
-        return card;
-    }
-    
-    private VBox createRatingDisplay(String label, int rating) {
-        VBox box = new VBox(2);
-        box.setAlignment(javafx.geometry.Pos.CENTER);
-        
-        Label titleLabel = new Label(label);
-        titleLabel.setStyle("-fx-font-size: 12px;");
-        
-        HBox starsBox = new HBox(2);
-        starsBox.setAlignment(javafx.geometry.Pos.CENTER);
-        
-        // Buat label dengan bintang yang lebih besar
-        Label starsLabel = new Label(getStarString(rating));
-        starsLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #FFD700;");
-        
-        starsBox.getChildren().add(starsLabel);
-        box.getChildren().addAll(titleLabel, starsBox);
+        box.getChildren().addAll(new Separator(), averageBox);
         
         return box;
     }
     
-    private String getStarString(int rating) {
-        StringBuilder stars = new StringBuilder();
-        for (int i = 0; i < rating; i++) {
-            stars.append("★"); // Bintang solid
+    private HBox createRatingDisplay(String label, int rating) {
+        HBox ratingBox = new HBox(10);
+        ratingBox.setAlignment(Pos.CENTER_LEFT);
+        
+        Label ratingLabel = new Label(label + ": ");
+        
+        HBox starsBox = new HBox(2);
+        for (int i = 1; i <= 5; i++) {
+            Text star = new Text(i <= rating ? "★" : "☆");
+            star.setFont(Font.font("System", 18)); // Ukuran bintang yang lebih besar
+            star.setFill(i <= rating ? Color.GOLD : Color.GRAY);
+            starsBox.getChildren().add(star);
         }
-        for (int i = rating; i < 5; i++) {
-            stars.append("☆"); // Bintang outline
-        }
-        return stars.toString();
+        
+        ratingBox.getChildren().addAll(ratingLabel, starsBox);
+        return ratingBox;
     }
     
-    public static void main(String[] args) {
-        launch(args);
+    private VBox createFeedbackTextSection(String title, String content) {
+        VBox section = new VBox(5);
+        
+        Label titleLabel = new Label(title + ":");
+        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
+        
+        TextArea contentArea = new TextArea(content);
+        contentArea.setEditable(false);
+        contentArea.setWrapText(true);
+        contentArea.setPrefRowCount(2);
+        
+        section.getChildren().addAll(titleLabel, contentArea);
+        return section;
+    }
+    
+    private void refreshLaporanData() {
+        laporanContent.getChildren().clear();
+        
+        List<LaporanBencanaData> laporanList = Dashboard.getAllLaporanBencana();
+        
+        if (laporanList.isEmpty()) {
+            Label emptyLabel = new Label("Tidak ada data laporan bencana.");
+            emptyLabel.setStyle("-fx-font-size: 14px;");
+            laporanContent.getChildren().add(emptyLabel);
+            return;
+        }
+        
+        for (int i = 0; i < laporanList.size(); i++) {
+            LaporanBencanaData laporan = laporanList.get(i);
+            HBox laporanBox = createLaporanBox(laporan, i);
+            laporanContent.getChildren().add(laporanBox);
+        }
+    }
+    
+    private HBox createLaporanBox(LaporanBencanaData laporan, int index) {
+        HBox box = new HBox(10);
+        box.setPadding(new Insets(10));
+        box.setStyle("-fx-background-color: #f0f8ff; -fx-background-radius: 5;");
+        
+        VBox detailsBox = new VBox(5);
+        detailsBox.setPrefWidth(650);
+        detailsBox.getChildren().addAll(
+            new Label("Jenis Bencana: " + laporan.getJenisBencana()),
+            new Label("Lokasi: " + laporan.getLokasi()),
+            new Label("Deskripsi: " + laporan.getDeskripsi()),
+            new Label("Tingkat Keparahan: " + laporan.getTingkatKeparahan()),
+            new Label("Jumlah Korban: " + laporan.getJumlahKorban())
+        );
+        
+        VBox actionsBox = new VBox(10);
+        actionsBox.setAlignment(Pos.CENTER);
+        
+        Button deleteButton = new Button("Hapus");
+        deleteButton.setStyle("-fx-background-color: #ff6b6b;");
+        deleteButton.setOnAction(e -> {
+            Dashboard.removeLaporanBencanaFromDatabase(index);
+            refreshData();
+        });
+        
+        actionsBox.getChildren().add(deleteButton);
+        
+        box.getChildren().addAll(detailsBox, actionsBox);
+        return box;
     }
 }
