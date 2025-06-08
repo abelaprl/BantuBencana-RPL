@@ -8,10 +8,8 @@ import javafx.scene.paint.Color; // Untuk mengubah warna teks label
 import java.io.IOException;
 import java.util.Optional;
 
-// Pastikan kelas User dan UserRepository ada di direktori yang sama (src/)
-// Jika Anda menggunakannya dengan package, Anda perlu import mereka
-// import com.bantubencana.model.User;
-// import com.bantubencana.repository.UserRepository;
+// Karena semua kelas ada di direktori yang sama (src/),
+// kita tidak perlu import package apa pun kecuali javafx.* dan java.io.*, java.util.*
 
 public class LoginController {
 
@@ -44,20 +42,19 @@ public class LoginController {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             // Verifikasi password
-            if (user.getPassword().equals(password)) { // **CATATAN: Ini tidak aman untuk produksi!**
+            if (user.getPassword().equals(password)) {
                 messageLabel.setText("Login berhasil!");
                 messageLabel.setTextFill(Color.GREEN);
                 System.out.println("Logged in as: " + user.getEmail());
 
-                // TODO: Navigasi ke halaman dashboard atau layar utama aplikasi
-                // Contoh:
-                // try {
-                //     Main.showDashboardView(user.getEmail()); // Anda perlu membuat metode ini di Main.java
-                // } catch (IOException e) {
-                //     e.printStackTrace();
-                //     messageLabel.setText("Error memuat dashboard.");
-                //     messageLabel.setTextFill(Color.RED);
-                // }
+                // Setelah login berhasil, arahkan ke Dashboard
+                try {
+                    Main.showDashboardView(user.getEmail()); // Panggil dashboard dengan email user
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    messageLabel.setText("Error memuat dashboard.");
+                    messageLabel.setTextFill(Color.RED);
+                }
             } else {
                 messageLabel.setText("Password salah.");
                 messageLabel.setTextFill(Color.RED);

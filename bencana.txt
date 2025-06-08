@@ -1,0 +1,5 @@
+Gempa Lombok|Nusa Tenggara Barat|Gempa bumi berkekuatan 6.4 SR mengguncang Lombok.|2018-07-29|bencana_lombok.jpg
+Banjir Jakarta|DKI Jakarta|Banjir besar melanda beberapa wilayah ibu kota.|2020-01-01|bencana_jakarta.jpg
+Erupsi Gunung Semeru|Jawa Timur|Gunung Semeru erupsi mengeluarkan awan panas guguran.|2021-12-04|bencana_semeru.jpg
+Tsunami Aceh|Aceh|Tsunami dahsyat meluluhlantakkan pesisir Aceh.|2004-12-26|bencana_aceh.jpg
+Kebakaran Hutan Kalimantan|Kalimantan Tengah|Kebakaran hutan dan lahan menyebabkan kabut asap pekat.|2019-09-01|bencana_kalimantan.jpg

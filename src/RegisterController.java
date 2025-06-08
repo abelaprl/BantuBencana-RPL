@@ -8,9 +8,8 @@ import javafx.scene.paint.Color; // Untuk mengubah warna teks label
 import java.io.IOException;
 import java.util.Optional;
 
-// Pastikan kelas User dan UserRepository ada di direktori yang sama (src/)
-// import com.bantubencana.model.User;
-// import com.bantubencana.repository.UserRepository;
+// Karena semua kelas ada di direktori yang sama (src/),
+// kita tidak perlu import package apa pun kecuali javafx.* dan java.io.*, java.util.*
 
 public class RegisterController {
 
@@ -70,8 +69,6 @@ public class RegisterController {
         //     Main.showLoginView();
         // } catch (IOException e) {
         //     e.printStackTrace();
-        //     messageLabel.setText("Error memuat halaman login.");
-        //     messageLabel.setTextFill(Color.RED);
         // }
     }
 

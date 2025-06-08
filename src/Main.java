@@ -38,6 +38,21 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    // Metode baru untuk menampilkan Dashboard
+    public static void showDashboardView(String userEmail) throws IOException {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("DashboardView.fxml"));
+        Parent root = loader.load();
+
+        // Dapatkan controller setelah FXML dimuat
+        DashboardController controller = loader.getController();
+        // Panggil metode initData() di DashboardController untuk meneruskan email pengguna
+        controller.initData(userEmail);
+
+        Scene scene = new Scene(root);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
     public static void main(String[] args) {
         // Metode launch() diperlukan untuk memulai aplikasi JavaFX
         launch(args);

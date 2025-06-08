@@ -6,7 +6,7 @@ import java.util.Optional;
 // Kelas ini bertanggung jawab untuk membaca dan menulis data User ke file teks
 public class UserRepository {
     // Nama file tempat data pengguna akan disimpan.
-    // File ini akan dibuat di direktori tempat aplikasi dijalankan (misal: root proyek)
+    // File ini akan dibuat di direktori tempat aplikasi dijalankan (root proyek atau src tergantung cara run)
     private static final String FILE_PATH = "users.txt";
 
     // Mengambil semua user dari file teks
@@ -24,9 +24,9 @@ public class UserRepository {
                 }
             }
         } catch (IOException e) {
-            // Tangani error I/O (misalnya, file belum ada atau ada masalah membaca)
-            System.err.println("Error membaca file pengguna: " + e.getMessage());
-            // Untuk debugging, Anda bisa mencetak stack trace: e.printStackTrace();
+            // File mungkin belum ada, tidak perlu error serius, hanya cetak pesan
+            System.err.println("File users.txt belum ada atau error membaca: " + e.getMessage());
+            // Anda bisa tambahkan log di sini: e.printStackTrace();
         }
         return users;
     }

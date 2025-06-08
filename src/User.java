@@ -1,4 +1,5 @@
 // Kelas ini mendefinisikan struktur data untuk User (Email dan Password)
+// Tidak ada import yang dibutuhkan karena tidak ada package lain yang digunakan.
 public class User {
     private String email;
     private String password;
