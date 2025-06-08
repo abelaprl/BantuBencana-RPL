@@ -9,6 +9,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
+import java.util.List;
 
 public class Feedback extends Application {
     
@@ -32,21 +33,29 @@ public class Feedback extends Application {
         title.setFont(Font.font("Arial", 20));
         title.setStyle("-fx-font-weight: bold;");
         
-        // Dropdown menus
+        // Dropdown menus - MENGAMBIL DATA DARI DATABASE LAPORAN BENCANA
         laporanBencana = new ComboBox<>();
-        laporanBencana.getItems().addAll("Laporan Bencana 1", "Laporan Bencana 2", "Laporan Bencana 3");
-        laporanBencana.setPromptText("Laporan Bencana*");
-        laporanBencana.setPrefWidth(200);
+        updateLaporanBencanaDropdown(); // Method untuk mengisi dropdown dari database
+        laporanBencana.setPromptText("Pilih Laporan Bencana*");
+        laporanBencana.setPrefWidth(250);
+        
+        // Event listener untuk update jenis dan lokasi berdasarkan laporan yang dipilih
+        laporanBencana.setOnAction(e -> {
+            String selectedLaporan = laporanBencana.getValue();
+            if (selectedLaporan != null) {
+                updateJenisAndLokasiFromLaporan(selectedLaporan);
+            }
+        });
         
         jenisBencana = new ComboBox<>();
-        jenisBencana.getItems().addAll("Banjir", "Gempa Bumi", "Kebakaran", "Longsor", "Tsunami");
-        jenisBencana.setPromptText("Pilih Jenis Bencana*");
+        jenisBencana.setPromptText("Jenis Bencana (Auto-filled)");
         jenisBencana.setPrefWidth(200);
+        jenisBencana.setDisable(true); // Disabled karena auto-filled
         
         lokasiLaporan = new ComboBox<>();
-        lokasiLaporan.getItems().addAll("Jakarta", "Bandung", "Surabaya", "Medan", "Makassar");
-        lokasiLaporan.setPromptText("Pilih Laporan Bencana*");
+        lokasiLaporan.setPromptText("Lokasi (Auto-filled)");
         lokasiLaporan.setPrefWidth(200);
+        lokasiLaporan.setDisable(true); // Disabled karena auto-filled
         
         // Rating sections
         VBox ratingSection1 = createRatingSection("Seberapa Baik Penanganan Bencana Dilakukan?", 
@@ -89,6 +98,17 @@ public class Feedback extends Application {
         });
         
         // Buttons
+        Button refreshButton = new Button("Refresh Data Laporan");
+        refreshButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-pref-width: 150;");
+        refreshButton.setOnAction(e -> {
+            updateLaporanBencanaDropdown();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Data Diperbarui");
+            alert.setHeaderText(null);
+            alert.setContentText("Data laporan bencana telah diperbarui!");
+            alert.showAndWait();
+        });
+        
         Button tutupButton = new Button("Tutup");
         tutupButton.setStyle("-fx-background-color: white; -fx-border-color: #ff6b6b; -fx-text-fill: #ff6b6b; -fx-pref-width: 100;");
         tutupButton.setOnAction(e -> primaryStage.close());
@@ -96,6 +116,16 @@ public class Feedback extends Application {
         Button kirimButton = new Button("Kirim");
         kirimButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-pref-width: 100;");
         kirimButton.setOnAction(e -> {
+            // Validasi input
+            if (laporanBencana.getValue() == null) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Input Tidak Lengkap");
+                alert.setHeaderText(null);
+                alert.setContentText("Mohon pilih laporan bencana terlebih dahulu!");
+                alert.showAndWait();
+                return;
+            }
+            
             // Simpan data ke feedback object
             saveFeedbackData();
             
@@ -123,7 +153,7 @@ public class Feedback extends Application {
         
         HBox buttonLayout = new HBox(10);
         buttonLayout.setAlignment(Pos.CENTER_RIGHT);
-        buttonLayout.getChildren().addAll(tutupButton, kirimButton);
+        buttonLayout.getChildren().addAll(refreshButton, tutupButton, kirimButton);
         
         mainLayout.getChildren().addAll(
             title, dropdownLayout, ratingSection1, ratingSection2, 
@@ -133,12 +163,46 @@ public class Feedback extends Application {
         
         ScrollPane scrollPane = new ScrollPane(mainLayout);
         scrollPane.setFitToWidth(true);
-        scrollPane.setPrefSize(800, 700);
+        scrollPane.setPrefSize(900, 700);
         
-        Scene scene = new Scene(scrollPane, 800, 700);
+        Scene scene = new Scene(scrollPane, 900, 700);
         primaryStage.setTitle("Feedback Pasca Bencana");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+    
+    // Method untuk mengisi dropdown laporan bencana dari database
+    private void updateLaporanBencanaDropdown() {
+        laporanBencana.getItems().clear();
+        List<LaporanBencanaData> laporanList = Dashboard.getAllLaporanBencana();
+        
+        if (laporanList.isEmpty()) {
+            laporanBencana.getItems().add("Belum ada laporan bencana");
+            laporanBencana.setDisable(true);
+        } else {
+            laporanBencana.setDisable(false);
+            for (LaporanBencanaData laporan : laporanList) {
+                laporanBencana.getItems().add(laporan.getDisplayName());
+            }
+        }
+    }
+    
+    // Method untuk update jenis dan lokasi berdasarkan laporan yang dipilih
+    private void updateJenisAndLokasiFromLaporan(String selectedLaporanDisplay) {
+        List<LaporanBencanaData> laporanList = Dashboard.getAllLaporanBencana();
+        
+        for (LaporanBencanaData laporan : laporanList) {
+            if (laporan.getDisplayName().equals(selectedLaporanDisplay)) {
+                jenisBencana.getItems().clear();
+                jenisBencana.getItems().add(laporan.getJenisBencana());
+                jenisBencana.setValue(laporan.getJenisBencana());
+                
+                lokasiLaporan.getItems().clear();
+                lokasiLaporan.getItems().add(laporan.getLokasiBencana());
+                lokasiLaporan.setValue(laporan.getLokasiBencana());
+                break;
+            }
+        }
     }
     
     private VBox createRatingSection(String question, String placeholder, int sectionIndex) {
@@ -147,13 +211,26 @@ public class Feedback extends Application {
         Label questionLabel = new Label(question);
         questionLabel.setStyle("-fx-font-weight: bold;");
         
-        // Star rating
-        HBox starBox = new HBox(5);
+        // Star rating dengan ukuran bintang yang lebih besar
+        HBox starBox = new HBox(10); // Spacing antar bintang diperbesar
+        starBox.setPadding(new Insets(5, 0, 5, 0)); // Padding atas dan bawah
+        starBox.setAlignment(Pos.CENTER_LEFT);
         Button[] stars = new Button[5];
         
         for (int i = 0; i < 5; i++) {
-            stars[i] = new Button("⭐");
-            stars[i].setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: #ddd;");
+            stars[i] = new Button("★"); // Menggunakan simbol bintang solid
+            
+            // Memperbesar ukuran bintang dan styling
+            stars[i].setStyle(
+                "-fx-background-color: transparent;" +
+                "-fx-border-color: transparent;" +
+                "-fx-text-fill: #ddd;" +
+                "-fx-font-size: 30px;" + // Ukuran font diperbesar
+                "-fx-min-width: 40px;" + // Lebar minimum
+                "-fx-min-height: 40px;" + // Tinggi minimum
+                "-fx-padding: 5px;" // Padding dalam button
+            );
+            
             final int rating = i + 1;
             final int currentSection = sectionIndex;
             
@@ -166,17 +243,63 @@ public class Feedback extends Application {
                     case 3: currentFeedback.setRatingPengalamanBuruk(rating); break;
                 }
                 
-                // Update star display
+                // Update star display dengan warna kuning yang lebih cerah
                 for (int j = 0; j < 5; j++) {
                     if (j < rating) {
-                        stars[j].setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: #FFD700;");
+                        stars[j].setStyle(
+                            "-fx-background-color: transparent;" +
+                            "-fx-border-color: transparent;" +
+                            "-fx-text-fill: #FFD700;" + // Gold color untuk bintang aktif
+                            "-fx-font-size: 30px;" +
+                            "-fx-min-width: 40px;" +
+                            "-fx-min-height: 40px;" +
+                            "-fx-padding: 5px;"
+                        );
                     } else {
-                        stars[j].setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-text-fill: #ddd;");
+                        stars[j].setStyle(
+                            "-fx-background-color: transparent;" +
+                            "-fx-border-color: transparent;" +
+                            "-fx-text-fill: #ddd;" +
+                            "-fx-font-size: 30px;" +
+                            "-fx-min-width: 40px;" +
+                            "-fx-min-height: 40px;" +
+                            "-fx-padding: 5px;"
+                        );
                     }
                 }
                 
                 System.out.println("Section " + currentSection + " - Rating: " + rating + " stars");
             });
+            
+            // Hover effect untuk bintang
+            stars[i].setOnMouseEntered(e -> {
+                if (!stars[0].getStyle().contains("#FFD700")) { // Jika belum dirating
+                    ((Button)e.getSource()).setStyle(
+                        "-fx-background-color: transparent;" +
+                        "-fx-border-color: transparent;" +
+                        "-fx-text-fill: #FFC107;" + // Amber color untuk hover
+                        "-fx-font-size: 30px;" +
+                        "-fx-min-width: 40px;" +
+                        "-fx-min-height: 40px;" +
+                        "-fx-padding: 5px;"
+                    );
+                }
+            });
+            
+            stars[i].setOnMouseExited(e -> {
+                if (!stars[0].getStyle().contains("#FFD700")) { // Jika belum dirating
+                    ((Button)e.getSource()).setStyle(
+                        "-fx-background-color: transparent;" +
+                        "-fx-border-color: transparent;" +
+                        "-fx-text-fill: #ddd;" +
+                        "-fx-font-size: 30px;" +
+                        "-fx-min-width: 40px;" +
+                        "-fx-min-height: 40px;" +
+                        "-fx-padding: 5px;"
+                    );
+                }
+            });
+            
             starBox.getChildren().add(stars[i]);
         }
         

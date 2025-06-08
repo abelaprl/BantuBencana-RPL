@@ -69,11 +69,23 @@ public class LaporanBencana extends Application {
                 return;
             }
             
-            // Simpan laporan (bisa ditambahkan ke database juga jika diperlukan)
+            // Buat object laporan bencana baru
+            LaporanBencanaData laporanBaru = new LaporanBencanaData(
+                jenisCombo.getValue(),
+                lokasiField.getText().trim(),
+                deskripsiArea.getText().trim(),
+                tingkatCombo.getValue(),
+                korbanField.getText().trim().isEmpty() ? "0" : korbanField.getText().trim()
+            );
+            
+            // Simpan ke database global
+            Dashboard.addLaporanBencanaToDatabase(laporanBaru);
+            
+            // Tampilkan konfirmasi
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Laporan Terkirim");
             alert.setHeaderText(null);
-            alert.setContentText("Laporan bencana berhasil dikirim!\n\n" +
+            alert.setContentText("Laporan bencana berhasil dikirim dan disimpan ke database!\n\n" +
                                "Jenis: " + jenisCombo.getValue() + "\n" +
                                "Lokasi: " + lokasiField.getText() + "\n" +
                                "Tingkat: " + tingkatCombo.getValue());
