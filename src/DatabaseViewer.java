@@ -233,20 +233,26 @@ public class DatabaseViewer {
 
     // BARU: Metode untuk membuat HBox tampilan untuk satu data donasi
     private HBox createDonationBox(DonationData donation, int index) {
+        
         HBox box = new HBox(10);
         box.setPadding(new Insets(10));
         box.setStyle("-fx-background-color: #fff0f5; -fx-background-radius: 5;"); // Warna pink muda
 
-        VBox detailsBox = new VBox(5);
-        detailsBox.setPrefWidth(650);
-        detailsBox.getChildren().addAll(
-            new Label("Bencana: " + donation.getDisasterType() + " di " + donation.getLocation()),
-            new Label("Jenis Donasi: " + donation.getDonationType()),
-            new Label("Jumlah/Deskripsi: " + donation.getAmountOrDescription()),
-            new Label("Email Donor: " + donation.getDonorEmail()),
-            new Label("Waktu Donasi: " + donation.getTimestamp())
-        );
+// Di DatabaseViewer.java, dalam metode createDonationBox
+// ...
 
+    VBox detailsBox = new VBox(5);
+    detailsBox.setPrefWidth(650);
+    detailsBox.getChildren().addAll(
+        new Label("Bencana: " + donation.getDisasterType() + " di " + donation.getLocation()),
+        new Label("Jenis Donasi: " + donation.getDonationType()),
+        new Label("Jumlah/Deskripsi: " + donation.getAmountOrDescription()),
+        new Label(donation.getDonationType().equals("Uang") ? "Metode Pembayaran: " + donation.getAdditionalInfo() : "Lokasi Drop-off: " + donation.getAdditionalInfo()), // BARU: Tampilkan info tambahan
+        new Label("Email Donor: " + donation.getDonorEmail()),
+        new Label("Waktu Donasi: " + donation.getTimestamp())
+    );
+
+    // ...
         VBox actionsBox = new VBox(10);
         actionsBox.setAlignment(Pos.CENTER);
 
