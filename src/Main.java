@@ -1,3 +1,4 @@
+// File: src/Main.java
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,53 +9,49 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    private static Stage primaryStage; // Untuk mengakses stage dari controller lain
+    private static Stage primaryStageStatic; // Untuk menyimpan primary stage
 
     @Override
-    public void start(Stage stage) throws IOException {
-        primaryStage = stage; // Simpan primary stage
-        primaryStage.setTitle("Bantu Bencana App"); // Judul jendela aplikasi
-        primaryStage.setResizable(false); // Opsional: jendela tidak bisa diubah ukurannya
-        showLoginView(); // Mulai dengan menampilkan tampilan login
+    public void start(Stage primaryStage) {
+        primaryStageStatic = primaryStage; // Simpan primary stage
+        primaryStage.setTitle("Bantu Bencana App");
+
+        // Panggil metode untuk menampilkan tampilan login terlebih dahulu
+        showLoginView();
     }
 
-    // Metode untuk menampilkan tampilan Login
-    public static void showLoginView() throws IOException {
-        // FXMLLoader.load() mencari file FXML relatif terhadap classpath dari kelas Main
-        // Karena LoginView.fxml berada di direktori yang sama dengan Main.java (src/),
-        // kita bisa langsung merujuknya.
-        Parent root = FXMLLoader.load(Main.class.getResource("LoginView.fxml"));
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    public static void showLoginView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("LoginView.fxml"));
+            Parent root = loader.load();
+            LoginController loginController = loader.getController();
+            loginController.setPrimaryStage(primaryStageStatic); // Set stage untuk LoginController
+
+            primaryStageStatic.setScene(new Scene(root, 400, 300));
+            primaryStageStatic.show();
+        } catch (IOException e) {
+            System.err.println("Error loading LoginView.fxml: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    // Metode untuk menampilkan tampilan Register
-    public static void showRegisterView() throws IOException {
-        // Sama seperti LoginView.fxml, RegisterView.fxml juga ada di src/
-        Parent root = FXMLLoader.load(Main.class.getResource("RegisterView.fxml"));
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
+    public static void showRegisterView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("RegisterView.fxml"));
+            Parent root = loader.load();
+            RegisterController registerController = loader.getController();
+            registerController.setPrimaryStage(primaryStageStatic); // Set stage untuk RegisterController
 
-    // Metode baru untuk menampilkan Dashboard
-    public static void showDashboardView(String userEmail) throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("DashboardView.fxml"));
-        Parent root = loader.load();
-
-        // Dapatkan controller setelah FXML dimuat
-        DashboardController controller = loader.getController();
-        // Panggil metode initData() di DashboardController untuk meneruskan email pengguna
-        controller.initData(userEmail);
-
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+            primaryStageStatic.setScene(new Scene(root, 400, 500)); // Sesuaikan ukuran window jika perlu
+            primaryStageStatic.show();
+        } catch (IOException e) {
+            System.err.println("Error loading RegisterView.fxml: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
-        // Metode launch() diperlukan untuk memulai aplikasi JavaFX
+        // DataManager.deleteDataFiles(); // <-- Anda bisa uncomment ini untuk menghapus semua data (termasuk user) untuk fresh start
         launch(args);
     }
 }

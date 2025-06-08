@@ -1,67 +1,68 @@
-import java.io.*;
+// File: src/UserRepository.java
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-// Kelas ini bertanggung jawab untuk membaca dan menulis data User ke file teks
 public class UserRepository {
-    // Nama file tempat data pengguna akan disimpan.
-    // File ini akan dibuat di direktori tempat aplikasi dijalankan (root proyek atau src tergantung cara run)
-    private static final String FILE_PATH = "users.txt";
+    private static List<User> userList;
 
-    // Mengambil semua user dari file teks
-    public List<User> findAll() {
-        List<User> users = new ArrayList<>();
-        // Menggunakan try-with-resources untuk memastikan BufferedReader ditutup otomatis
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
-            String line;
-            // Baca setiap baris dari file
-            while ((line = reader.readLine()) != null) {
-                // Konversi setiap baris menjadi objek User
-                User user = User.fromString(line);
-                if (user != null) {
-                    users.add(user); // Tambahkan ke daftar user jika valid
-                }
+    static {
+        userList = DataManager.loadUserData(); // Muat data user dari file
+    }
+
+    public void register(User user) {
+        // Periksa apakah username atau email sudah terdaftar
+        if (isUsernameTaken(user.getUsername())) {
+            System.out.println("Registrasi gagal: Username '" + user.getUsername() + "' sudah ada.");
+        } else if (isEmailTaken(user.getEmail())) { // <-- Tambahkan pengecekan email
+            System.out.println("Registrasi gagal: Email '" + user.getEmail() + "' sudah ada.");
+        }
+        else {
+            userList.add(user);
+            DataManager.saveUserData(userList); // Simpan data setelah registrasi
+            System.out.println("User " + user.getUsername() + " berhasil didaftarkan.");
+        }
+    }
+
+    // Metode autentikasi berdasarkan username (tetap ada jika suatu saat ingin pakai username)
+    public User authenticate(String username, String password) {
+        for (User user : userList) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                return user; // Autentikasi berhasil
             }
-        } catch (IOException e) {
-            // File mungkin belum ada, tidak perlu error serius, hanya cetak pesan
-            System.err.println("File users.txt belum ada atau error membaca: " + e.getMessage());
-            // Anda bisa tambahkan log di sini: e.printStackTrace();
         }
-        return users;
+        return null; // Autentikasi gagal
     }
 
-    // Mencari user berdasarkan email
-    public Optional<User> findByEmail(String email) {
-        // Ambil semua user, lalu filter untuk menemukan yang cocok dengan email
-        return findAll().stream()
-                .filter(user -> user.getEmail().equals(email))
-                .findFirst(); // Ambil user pertama yang cocok (email harus unik)
-    }
-
-    // Menyimpan user baru ke file
-    public void save(User user) {
-        // Menggunakan try-with-resources untuk memastikan BufferedWriter ditutup otomatis
-        // FileWriter(FILE_PATH, true) berarti akan menambahkan ke akhir file (append mode)
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
-            writer.write(user.toString()); // Tulis representasi string dari objek User
-            writer.newLine(); // Tambahkan baris baru untuk user berikutnya
-        } catch (IOException e) {
-            System.err.println("Error menyimpan user ke file: " + e.getMessage());
-            // e.printStackTrace();
-        }
-    }
-
-    // Metode ini akan digunakan jika Anda ingin menghapus atau memperbarui user
-    // (lebih kompleks karena harus menulis ulang seluruh file)
-    public void saveAll(List<User> users) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, false))) { // false = overwrite
-            for (User user : users) {
-                writer.write(user.toString());
-                writer.newLine();
+    // <-- Tambahkan metode autentikasi berdasarkan Email -->
+    public User authenticateByEmail(String email, String password) {
+        for (User user : userList) {
+            if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
+                return user; // Autentikasi berhasil
             }
-        } catch (IOException e) {
-            System.err.println("Error menulis ulang file pengguna: " + e.getMessage());
         }
+        return null; // Autentikasi gagal
+    }
+
+    public boolean isUsernameTaken(String username) {
+        for (User user : userList) {
+            if (user.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // <-- Tambahkan metode untuk memeriksa apakah email sudah terdaftar -->
+    public boolean isEmailTaken(String email) {
+        for (User user : userList) {
+            if (user.getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<User> getAllUsers() {
+        return new ArrayList<>(userList);
     }
 }

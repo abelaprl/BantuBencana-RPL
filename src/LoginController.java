@@ -1,79 +1,58 @@
+// File: src/LoginController.java
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.event.ActionEvent; // Penting untuk menangani event
-import javafx.scene.paint.Color; // Untuk mengubah warna teks label
-
-import java.io.IOException;
-import java.util.Optional;
-
-// Karena semua kelas ada di direktori yang sama (src/),
-// kita tidak perlu import package apa pun kecuali javafx.* dan java.io.*, java.util.*
+import javafx.stage.Stage;
+import javafx.scene.Node;
 
 public class LoginController {
 
-    @FXML // Menghubungkan elemen UI dari FXML ke variabel di controller
-    private TextField emailField;
+    @FXML
+    private TextField usernameField; // Meskipun namanya usernameField, ini akan digunakan untuk email
     @FXML
     private PasswordField passwordField;
     @FXML
-    private Label messageLabel; // Label untuk menampilkan pesan ke pengguna
+    private Label errorMessageLabel;
 
-    // Instansiasi UserRepository untuk berinteraksi dengan data pengguna
-    private UserRepository userRepository = new UserRepository();
+    private Stage primaryStage;
 
-    // Metode yang dipanggil saat tombol "Login" diklik
+    public void setPrimaryStage(Stage stage) {
+        this.primaryStage = stage;
+    }
+
     @FXML
-    private void handleLogin(ActionEvent event) {
-        String email = emailField.getText();
+    public void handleLogin(ActionEvent event) {
+        String email = usernameField.getText(); // Ambil input sebagai email
         String password = passwordField.getText();
 
-        // Validasi input
-        if (email.isEmpty() || password.isEmpty()) {
-            messageLabel.setText("Email dan password tidak boleh kosong.");
-            messageLabel.setTextFill(Color.RED);
-            return;
-        }
+        UserRepository userRepository = new UserRepository();
+        // Ubah ini untuk mencari user berdasarkan email
+        User user = userRepository.authenticateByEmail(email, password);
 
-        // Cari pengguna berdasarkan email
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (user != null) {
+            errorMessageLabel.setText("");
+            System.out.println("Login Sukses untuk pengguna: " + user.getUsername() + " (" + user.getEmail() + ")");
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            // Verifikasi password
-            if (user.getPassword().equals(password)) {
-                messageLabel.setText("Login berhasil!");
-                messageLabel.setTextFill(Color.GREEN);
-                System.out.println("Logged in as: " + user.getEmail());
+            if (primaryStage != null) {
+                ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
 
-                // Setelah login berhasil, arahkan ke Dashboard
-                try {
-                    Main.showDashboardView(user.getEmail()); // Panggil dashboard dengan email user
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    messageLabel.setText("Error memuat dashboard.");
-                    messageLabel.setTextFill(Color.RED);
-                }
-            } else {
-                messageLabel.setText("Password salah.");
-                messageLabel.setTextFill(Color.RED);
+                Dashboard dashboard = new Dashboard();
+                dashboard.start(new Stage(), user.getEmail());
             }
+
         } else {
-            messageLabel.setText("User tidak ditemukan.");
-            messageLabel.setTextFill(Color.RED);
+            errorMessageLabel.setText("Email atau password salah!"); // Ubah pesan error
         }
     }
 
-    // Metode yang dipanggil saat tombol/link "Register here" diklik
     @FXML
-    private void handleRegisterRedirect(ActionEvent event) {
-        try {
-            Main.showRegisterView(); // Panggil metode di Main untuk beralih ke tampilan Register
-        } catch (IOException e) {
-            e.printStackTrace();
-            messageLabel.setText("Error memuat halaman pendaftaran.");
-            messageLabel.setTextFill(Color.RED);
+    private void handleRegisterLink(ActionEvent event) {
+        System.out.println("Navigasi ke halaman registrasi.");
+        if (primaryStage != null) {
+            ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
+            Main.showRegisterView();
         }
     }
 }

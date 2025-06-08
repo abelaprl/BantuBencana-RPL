@@ -1,45 +1,48 @@
-// Kelas ini mendefinisikan struktur data untuk User (Email dan Password)
-// Tidak ada import yang dibutuhkan karena tidak ada package lain yang digunakan.
-public class User {
-    private String email;
-    private String password;
+// File: src/User.java
+import java.io.Serializable; // Tambahkan import ini
 
-    public User(String email, String password) {
-        this.email = email;
+public class User implements Serializable { // Implementasikan Serializable
+    private static final long serialVersionUID = 1L; // Direkomendasikan untuk Serializable
+
+    private String username;
+    private String password; // Untuk contoh sederhana, kita simpan plain text. Dalam aplikasi nyata, gunakan hashing!
+    private String email; // Tambahkan field email jika belum ada
+
+    public User(String username, String password, String email) {
+        this.username = username;
         this.password = password;
+        this.email = email;
     }
 
-    // Getter methods
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
-    // Setter methods (opsional, tergantung kebutuhan)
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
 
-    // Metode toString() digunakan untuk mengubah objek User menjadi format string
-    // yang akan disimpan di file teks (dipisahkan koma: email,password)
-    @Override
-    public String toString() {
-        return email + "," + password;
+    public String getEmail() {
+        return email;
     }
 
-    // Metode statis untuk membuat objek User dari satu baris string dari file teks
-    public static User fromString(String line) {
-        String[] parts = line.split(","); // Pisahkan string berdasarkan koma
-        if (parts.length == 2) { // Pastikan ada dua bagian (email dan password)
-            return new User(parts[0], parts[1]);
-        }
-        return null; // Kembalikan null jika format tidak valid
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+               "username='" + username + '\'' +
+               ", email='" + email + '\'' +
+               '}';
     }
 }

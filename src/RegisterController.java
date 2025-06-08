@@ -1,86 +1,82 @@
+// File: src/RegisterController.java
+
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.event.ActionEvent; // Penting untuk menangani event
-import javafx.scene.paint.Color; // Untuk mengubah warna teks label
+import javafx.stage.Stage;
+import javafx.scene.Node;
 
-import java.io.IOException;
-import java.util.Optional;
-
-// Karena semua kelas ada di direktori yang sama (src/),
-// kita tidak perlu import package apa pun kecuali javafx.* dan java.io.*, java.util.*
-
+// PASTIKAN HANYA ADA public class RegisterController DI FILE INI
 public class RegisterController {
 
     @FXML
-    private TextField emailField;
+    private TextField usernameField;
     @FXML
     private PasswordField passwordField;
     @FXML
-    private PasswordField confirmPasswordField; // Untuk konfirmasi password
+    private PasswordField confirmPasswordField;
     @FXML
-    private Label messageLabel; // Label untuk menampilkan pesan
-
-    private UserRepository userRepository = new UserRepository();
-
-    // Metode yang dipanggil saat tombol "Register" diklik
+    private TextField emailField;
     @FXML
-    private void handleRegister(ActionEvent event) {
-        String email = emailField.getText();
-        String password = passwordField.getText();
-        String confirmPassword = confirmPasswordField.getText();
+    private Label errorMessageLabel;
 
-        // Validasi input: semua kolom harus diisi
-        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            messageLabel.setText("Semua kolom harus diisi.");
-            messageLabel.setTextFill(Color.RED);
-            return;
-        }
+    private Stage primaryStage;
 
-        // Validasi password: harus cocok
-        if (!password.equals(confirmPassword)) {
-            messageLabel.setText("Password tidak cocok.");
-            messageLabel.setTextFill(Color.RED);
-            return;
-        }
-
-        // Cek apakah email sudah terdaftar
-        Optional<User> existingUser = userRepository.findByEmail(email);
-        if (existingUser.isPresent()) {
-            messageLabel.setText("Email sudah terdaftar.");
-            messageLabel.setTextFill(Color.RED);
-            return;
-        }
-
-        // Jika semua validasi berhasil, buat user baru dan simpan
-        User newUser = new User(email, password);
-        userRepository.save(newUser);
-        messageLabel.setText("Pendaftaran berhasil! Silakan login.");
-        messageLabel.setTextFill(Color.GREEN);
-
-        // Opsional: Bersihkan kolom input setelah berhasil daftar
-        emailField.clear();
-        passwordField.clear();
-        confirmPasswordField.clear();
-
-        // Opsional: Langsung arahkan ke halaman login setelah daftar berhasil
-        // try {
-        //     Main.showLoginView();
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
+    public void setPrimaryStage(Stage stage) {
+        this.primaryStage = stage;
     }
 
-    // Metode yang dipanggil saat tombol/link "Login here" diklik
     @FXML
-    private void handleLoginRedirect(ActionEvent event) {
-        try {
-            Main.showLoginView(); // Panggil metode di Main untuk beralih ke tampilan Login
-        } catch (IOException e) {
-            e.printStackTrace();
-            messageLabel.setText("Error memuat halaman login.");
-            messageLabel.setTextFill(Color.RED);
+    private void handleRegister(ActionEvent event) {
+        String username = usernameField.getText();
+        String password = passwordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
+        String email = emailField.getText();
+
+        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || email.isEmpty()) {
+            errorMessageLabel.setText("Semua field harus diisi!");
+            return;
         }
+
+        if (!password.equals(confirmPassword)) {
+            errorMessageLabel.setText("Password dan konfirmasi password tidak cocok!");
+            return;
+        }
+
+        UserRepository userRepository = new UserRepository();
+        if (userRepository.isUsernameTaken(username)) {
+            errorMessageLabel.setText("Username sudah digunakan!");
+            return;
+        }
+
+        User newUser = new User(username, password, email);
+        userRepository.register(newUser);
+
+        errorMessageLabel.setText("");
+        showAlert(javafx.scene.control.Alert.AlertType.INFORMATION, "Registrasi Berhasil", "Akun Anda telah berhasil dibuat. Silakan login.");
+
+        if (primaryStage != null) {
+            ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
+            Main.showLoginView();
+        }
+    }
+
+    @FXML
+    private void handleLoginLink(ActionEvent event) {
+        System.out.println("Navigasi kembali ke halaman login.");
+        if (primaryStage != null) {
+            ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
+            Main.showLoginView();
+        }
+    }
+
+    private void showAlert(javafx.scene.control.Alert.AlertType type, String title, String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

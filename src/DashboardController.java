@@ -1,3 +1,4 @@
+// src/DashboardController.java
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -9,7 +10,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.event.ActionEvent; // Penting untuk menangani event Logout
+import javafx.event.ActionEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,133 +21,134 @@ import java.util.ResourceBundle;
 public class DashboardController implements Initializable {
 
     @FXML
-    private Label userEmailLabel; // Untuk menampilkan email pengguna yang login
+    private Label userEmailLabel;
     @FXML
-    private VBox bencanaListContainer; // Container untuk daftar bencana
+    private VBox bencanaListContainer;
 
     private BencanaRepository bencanaRepository = new BencanaRepository();
-    private String loggedInUserEmail; // Untuk menyimpan email pengguna yang login
+    private String loggedInUserEmail;
 
-    // Metode ini dipanggil secara otomatis setelah FXML dimuat.
-    // Kami akan memuat data bencana setelah email user diset (melalui initData).
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Implementasi logika inisialisasi awal jika ada
+        // Initialization logic, if any
     }
 
-    // Metode untuk menerima data (email) dari Main.java setelah login
     public void initData(String email) {
         this.loggedInUserEmail = email;
-        userEmailLabel.setText(email); // Tampilkan email pengguna di sidebar
-        loadBencanaData(); // Muat data bencana setelah email diatur
+        userEmailLabel.setText(email);
+        System.out.println("DEBUG: User " + email + " logged in. Loading dashboard data.");
+        loadBencanaData();
     }
 
-    // Metode untuk memuat dan menampilkan data bencana
     private void loadBencanaData() {
-        List<Bencana> bencanas = bencanaRepository.findAll(); // Ambil semua data bencana
-        bencanaListContainer.getChildren().clear(); // Bersihkan container dari elemen sebelumnya
+        System.out.println("DEBUG: Starting to load bencana data.");
+        List<Bencana> bencanas = bencanaRepository.findAll();
+        bencanaListContainer.getChildren().clear();
 
         if (bencanas.isEmpty()) {
+            System.out.println("DEBUG: No bencana data found in repository.");
             Label noDataLabel = new Label("Tidak ada data bencana yang tersedia.");
             noDataLabel.setTextFill(Color.GRAY);
             noDataLabel.setFont(new Font(16));
             bencanaListContainer.getChildren().add(noDataLabel);
         } else {
-            // Untuk setiap objek Bencana, buatkan "card" tampilannya
+            System.out.println("DEBUG: Found " + bencanas.size() + " bencana entries.");
             for (Bencana bencana : bencanas) {
                 bencanaListContainer.getChildren().add(createBencanaCard(bencana));
             }
         }
     }
 
-    // Metode untuk membuat "card" (tampilan visual) untuk setiap bencana
     private VBox createBencanaCard(Bencana bencana) {
-        VBox card = new VBox(10); // VBox dengan spasi 10px antar elemen
-        card.setPadding(new Insets(15)); // Padding di dalam card
+        VBox card = new VBox(10);
+        card.setPadding(new Insets(15));
         card.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 1px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
-        card.setMaxWidth(600); // Batasi lebar card untuk tampilan yang rapi
+        card.setMaxWidth(600);
 
-        // --- Gambar Bencana ---
         ImageView imageView = new ImageView();
-        // Path relatif dari lokasi aplikasi dijalankan (yaitu root proyek: BantuBencana-RPL)
-        // Karena `Main.class.getResource()` akan mencari di classpath yang saat ini adalah src/
-        // dan `new Image()` dari String path akan relatif terhadap CWD (Current Working Directory)
-        // yang saat menjalankan `java -cp . Main` adalah `src/`, maka path ini sedikit berbeda.
-        // Solusi paling mudah untuk saat ini adalah dengan jalur absolut ke file gambar.
-        // Atau, jika Anda menjalankan dari `BantuBencana-RPL` (parent dari src), maka
-        // `file:img/bencana_photos/` akan berfungsi.
-        // Untuk skenario flat di src/ dan dijalankan dari src/,
-        // kita perlu menggunakan path file absolut atau memastikan `img` di root proyek.
 
-        // Solusi terbaik untuk struktur saat ini (semua di src) dan dijalankan dari src/:
-        // Asumsikan `img` berada di PARENT dari `src`.
-        // Dapatkan path dari `src/Main.java` (yang sama dengan DashboardController)
-        // Kemudian naik satu level ke `BantuBencana-RPL/` dan turun ke `img/bencana_photos/`
-        URL imageUrl = Main.class.getResource("/../img/bencana_photos/" + bencana.getNamaFileGambar());
+        // --- DEBUGGING EKSTRA ---
+        System.out.println("\n--- Memproses Bencana: " + bencana.getJudul() + " ---");
+        String namaFileGambarDariObjek = bencana.getNamaFileGambar();
+        System.out.println("DEBUG: Nama file gambar dari objek Bencana: '" + namaFileGambarDariObjek + "'");
+
+        // Construct the full relative path
+        String relativePathForImage = "/../img/bencana_photos/" + namaFileGambarDariObjek;
+        System.out.println("DEBUG: Path relatif yang dicoba untuk gambar: '" + relativePathForImage + "'");
+
+        URL imageUrl = Main.class.getResource(relativePathForImage);
 
         if (imageUrl != null) {
-            Image image = new Image(imageUrl.toExternalForm());
-            imageView.setImage(image);
-            imageView.setFitWidth(570); // Lebar gambar dalam card
-            imageView.setFitHeight(200); // Tinggi gambar
-            imageView.setPreserveRatio(false); // Biarkan gambar mengisi area
+            System.out.println("DEBUG: Gambar DITEMUKAN di URL: " + imageUrl.toExternalForm());
+            try {
+                Image image = new Image(imageUrl.toExternalForm());
+                if (image.isError()) {
+                    System.err.println("ERROR: Gambar gagal dimuat setelah ditemukan URL. Pesan error: " + image.exceptionProperty().get().getMessage());
+                    Label errorLabel = new Label("Gambar rusak atau tidak dapat dimuat: " + namaFileGambarDariObjek);
+                    errorLabel.setTextFill(Color.RED);
+                    errorLabel.setFont(new Font(12));
+                    imageView.setFitWidth(570);
+                    imageView.setFitHeight(100);
+                    card.getChildren().add(errorLabel);
+                } else {
+                    imageView.setImage(image);
+                    imageView.setFitWidth(570);
+                    imageView.setFitHeight(200);
+                    imageView.setPreserveRatio(false);
+                }
+            } catch (Exception e) {
+                System.err.println("ERROR: Pengecualian saat membuat objek Image: " + e.getMessage());
+                Label errorLabel = new Label("Error memuat gambar: " + namaFileGambarDariObjek);
+                errorLabel.setTextFill(Color.RED);
+                errorLabel.setFont(new Font(12));
+                imageView.setFitWidth(570);
+                imageView.setFitHeight(100);
+                card.getChildren().add(errorLabel);
+            }
         } else {
-            System.err.println("Gagal memuat gambar: /../img/bencana_photos/" + bencana.getNamaFileGambar() + " - File tidak ditemukan atau path salah.");
-            Label errorLabel = new Label("Gambar tidak ditemukan");
+            System.err.println("ERROR: Gambar TIDAK DITEMUKAN di path: '" + relativePathForImage + "'");
+            System.err.println("DEBUG: Current working directory (saat java dijalankan) kemungkinan di 'D:\\TUGAS SEM 5\\BantuBencana-RPL\\src'");
+            System.err.println("DEBUG: Pastikan file gambar ada di 'D:\\TUGAS SEM 5\\BantuBencana-RPL\\img\\bencana_photos\\" + namaFileGambarDariObjek + "'");
+            Label errorLabel = new Label("Gambar tidak ditemukan: " + namaFileGambarDariObjek);
             errorLabel.setTextFill(Color.RED);
+            errorLabel.setFont(new Font(12));
             imageView.setFitWidth(570);
             imageView.setFitHeight(100);
-            // Tambahkan errorLabel jika gambar tidak ditemukan
             card.getChildren().add(errorLabel);
         }
 
-        // --- Judul Bencana ---
         Label judulLabel = new Label(bencana.getJudul());
         judulLabel.setFont(new Font("System Bold", 18));
-        judulLabel.setWrapText(true); // Mengizinkan teks untuk wrap
+        judulLabel.setWrapText(true);
 
-        // --- Lokasi ---
         Label lokasiLabel = new Label("Lokasi: " + bencana.getLokasi());
         lokasiLabel.setFont(new Font(14));
 
-        // --- Tanggal ---
         Label tanggalLabel = new Label("Tanggal: " + bencana.getTanggal());
         tanggalLabel.setFont(new Font(14));
 
-        // --- Deskripsi Singkat ---
         Label deskripsiLabel = new Label(bencana.getDeskripsiSingkat());
         deskripsiLabel.setFont(new Font(13));
         deskripsiLabel.setWrapText(true);
 
-        // --- Tombol "Lihat Detail" atau "Donasi" (opsional) ---
-        HBox buttonBox = new HBox(10); // HBox dengan spasi 10px antar tombol
+        HBox buttonBox = new HBox(10);
         Button detailButton = new Button("Lihat Detail");
         Button donasiButton = new Button("Donasi");
         buttonBox.getChildren().addAll(detailButton, donasiButton);
 
-        // Tambahkan semua elemen ke card
         card.getChildren().addAll(imageView, judulLabel, lokasiLabel, tanggalLabel, deskripsiLabel, buttonBox);
 
         return card;
     }
 
-    // Metode untuk menangani logout
     @FXML
     private void handleLogout(ActionEvent event) {
         try {
-            Main.showLoginView(); // Kembali ke tampilan login
+            System.out.println("DEBUG: Logging out and returning to LoginView.");
+            Main.showLoginView();
         } catch (IOException e) {
             e.printStackTrace();
-            // Handle error jika tidak bisa kembali ke login
-            System.err.println("Gagal kembali ke halaman login.");
+            System.err.println("ERROR: Gagal kembali ke halaman login.");
         }
     }
-
-    // TODO: Tambahkan metode lain untuk navigasi sidebar jika tombol-tombol sidebar
-    // memiliki fx:id dan onAction yang terhubung di FXML
-    // Contoh:
-    // @FXML
-    // private void handleLaporanBencanaClick(ActionEvent event) {
-    //     // Logic untuk beralih ke tampilan laporan bencana
-    // }
 }
