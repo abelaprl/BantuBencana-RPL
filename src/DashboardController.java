@@ -1,4 +1,3 @@
-// src/DashboardController.java
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -11,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.event.ActionEvent;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,9 @@ public class DashboardController implements Initializable {
 
     public void initData(String email) {
         this.loggedInUserEmail = email;
-        userEmailLabel.setText(email);
+        if (userEmailLabel != null) {
+            userEmailLabel.setText(email);
+        }
         System.out.println("DEBUG: User " + email + " logged in. Loading dashboard data.");
         loadBencanaData();
     }
@@ -43,6 +45,7 @@ public class DashboardController implements Initializable {
     private void loadBencanaData() {
         System.out.println("DEBUG: Starting to load bencana data.");
         List<Bencana> bencanas = bencanaRepository.findAll();
+
         bencanaListContainer.getChildren().clear();
 
         if (bencanas.isEmpty()) {
@@ -67,16 +70,14 @@ public class DashboardController implements Initializable {
 
         ImageView imageView = new ImageView();
 
-        // --- DEBUGGING EKSTRA ---
         System.out.println("\n--- Memproses Bencana: " + bencana.getJudul() + " ---");
         String namaFileGambarDariObjek = bencana.getNamaFileGambar();
         System.out.println("DEBUG: Nama file gambar dari objek Bencana: '" + namaFileGambarDariObjek + "'");
 
-        // Construct the full relative path
-        String relativePathForImage = "/../img/bencana_photos/" + namaFileGambarDariObjek;
+        String relativePathForImage = "/img/bencana_photos/" + namaFileGambarDariObjek;
         System.out.println("DEBUG: Path relatif yang dicoba untuk gambar: '" + relativePathForImage + "'");
 
-        URL imageUrl = Main.class.getResource(relativePathForImage);
+        URL imageUrl = getClass().getResource(relativePathForImage);
 
         if (imageUrl != null) {
             System.out.println("DEBUG: Gambar DITEMUKAN di URL: " + imageUrl.toExternalForm());
@@ -107,8 +108,8 @@ public class DashboardController implements Initializable {
             }
         } else {
             System.err.println("ERROR: Gambar TIDAK DITEMUKAN di path: '" + relativePathForImage + "'");
-            System.err.println("DEBUG: Current working directory (saat java dijalankan) kemungkinan di 'D:\\TUGAS SEM 5\\BantuBencana-RPL\\src'");
-            System.err.println("DEBUG: Pastikan file gambar ada di 'D:\\TUGAS SEM 5\\BantuBencana-RPL\\img\\bencana_photos\\" + namaFileGambarDariObjek + "'");
+            System.err.println("DEBUG: Current working directory (saat java dijalankan) kemungkinan di 'D:\\TUGAS SEM 5\\BantuBencana-RPL\\src' (jika Anda menjalankan dari IDE)");
+            System.err.println("DEBUG: Pastikan file gambar ada di folder 'resources' Anda, misal: 'src/main/resources/img/bencana_photos/" + namaFileGambarDariObjek + "'");
             Label errorLabel = new Label("Gambar tidak ditemukan: " + namaFileGambarDariObjek);
             errorLabel.setTextFill(Color.RED);
             errorLabel.setFont(new Font(12));
@@ -135,13 +136,23 @@ public class DashboardController implements Initializable {
         Button detailButton = new Button("Lihat Detail");
         detailButton.setOnAction(e -> {
             try {
-                Main.showDetailLaporan(bencana);
-            } catch (IOException ex) {
+                Main.showDetailLaporan(bencana); // Memanggil Main.showDetailLaporan dengan objek Bencana
+                System.out.println("DEBUG: Membuka detail laporan untuk: " + bencana.getJudul());
+            } catch (IOException ex) { // Tangkap IOException
                 ex.printStackTrace();
                 System.err.println("ERROR: Gagal membuka detail laporan.");
             }
         });
         Button donasiButton = new Button("Donasi");
+        donasiButton.setOnAction(e -> {
+            try {
+                new DonationPage(loggedInUserEmail).start(new Stage());
+                System.out.println("DEBUG: Membuka halaman Donasi untuk: " + bencana.getJudul());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                System.err.println("ERROR: Gagal membuka halaman donasi dari card.");
+            }
+        });
         buttonBox.getChildren().addAll(detailButton, donasiButton);
 
         card.getChildren().addAll(imageView, judulLabel, lokasiLabel, tanggalLabel, deskripsiLabel, buttonBox);
@@ -153,6 +164,7 @@ public class DashboardController implements Initializable {
     private void handleLogout(ActionEvent event) {
         try {
             System.out.println("DEBUG: Logging out and returning to LoginView.");
+            // Menggunakan Main.showLoginView() yang sudah didefinisikan di kelas Main Anda
             Main.showLoginView();
         } catch (IOException e) {
             e.printStackTrace();
@@ -163,11 +175,33 @@ public class DashboardController implements Initializable {
     @FXML
     private void handleLaporanBencana(ActionEvent event) {
         try {
-            System.out.println("DEBUG: Navigating to Laporan Bencana list.");
-            Main.showLaporanList();
+            System.out.println("DEBUG: Navigating to Laporan Bencana form.");
+            Main.showBuatLaporan(); // Menggunakan Main.showBuatLaporan()
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("ERROR: Gagal membuka halaman laporan bencana.");
+        }
+    }
+
+    @FXML
+    private void handleFeedback(ActionEvent event) {
+        try {
+            System.out.println("DEBUG: Navigating to Feedback form.");
+            new Feedback().start(new Stage(), loggedInUserEmail);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("ERROR: Gagal membuka halaman feedback.");
+        }
+    }
+
+    @FXML
+    private void handleDonasi(ActionEvent event) {
+        try {
+            System.out.println("DEBUG: Navigating to Donation page.");
+            new DonationPage(loggedInUserEmail).start(new Stage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("ERROR: Gagal membuka halaman donasi.");
         }
     }
 }

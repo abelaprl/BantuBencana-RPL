@@ -106,3 +106,231 @@
     -fx-background-color: #1e7e34;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
 }
+
+/* --- Global Styles for Dashboard --- */
+.dashboard-root-pane {
+    -fx-background-color: linear-gradient(to bottom right, #e0e5ec, #f0f2f5); /* Consistent background */
+}
+
+/* --- Sidebar Styles --- */
+.sidebar {
+    -fx-background-color: #2E8B57; /* Dark Green */
+    -fx-padding: 20px 10px;
+    -fx-spacing: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 0); /* Subtle shadow for depth */
+}
+
+.sidebar-logo {
+    /* No specific style for ImageView itself, maybe add a border or shadow later if needed */
+}
+
+.sidebar-app-name {
+    -fx-text-fill: white;
+    -fx-font-family: "System Bold";
+    -fx-font-size: 20px;
+}
+
+.sidebar-user-email {
+    -fx-text-fill: #E0E0E0; /* Slightly off-white for subtitle */
+    -fx-font-size: 14px;
+    -fx-padding: 0 0 10px 0; /* Add some padding below email */
+}
+
+.sidebar-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 230px; /* Ensure consistent width */
+    -fx-padding: 10px 15px; /* Add padding for better click area */
+    -fx-background-radius: 5px;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #3CB371; /* Lighter green on hover */
+    -fx-cursor: hand;
+}
+
+.sidebar-button:pressed {
+    -fx-background-color: #2E8B57; /* Darker on pressed */
+}
+
+.sidebar-button-active {
+    -fx-background-color: #3CB371; /* Active button color */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 230px;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+    -fx-font-weight: bold; /* Make active button bold */
+}
+
+.sidebar-button-active:hover {
+     -fx-background-color: #4CAF50; /* Slightly different hover for active */
+     -fx-cursor: hand;
+}
+
+.sidebar-button-logout {
+    -fx-background-color: #FF6347; /* Tomato */
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER; /* Center align logout button text */
+    -fx-pref-width: 230px;
+    -fx-padding: 10px 15px;
+    -fx-background-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+.sidebar-button-logout:hover {
+    -fx-background-color: #E64A19; /* Darker red on hover */
+    -fx-cursor: hand;
+}
+
+/* --- Main Content Area Styles --- */
+.main-content-pane {
+    -fx-background-color: #f8f9fa; /* Light background for the content area */
+    -fx-padding: 20px;
+    -fx-spacing: 20px;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 0); /* Subtle inner shadow */
+}
+
+.section-title {
+    -fx-font-family: "System Bold";
+    -fx-font-size: 24px; /* Slightly larger title */
+    -fx-font-weight: bold;
+    -fx-fill: #333333;
+    -fx-text-alignment: center;
+    -fx-padding: 0 0 10px 0; /* Add padding below title */
+}
+
+.custom-scroll-pane {
+    -fx-background-color: transparent; /* Make scrollpane background transparent */
+    -fx-hbar-policy: never; /* Hide horizontal scrollbar if not needed */
+    -fx-vbar-policy: as_needed; /* Show vertical scrollbar only if needed */
+}
+
+/* Hide scroll pane background and border */
+.custom-scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.custom-scroll-pane .scroll-bar:vertical .increment-button,
+.custom-scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-padding: 0;
+}
+
+.custom-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #bbbbbb; /* Custom scrollbar thumb color */
+    -fx-background-insets: 0;
+    -fx-background-radius: 5em;
+}
+
+.custom-scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: #E0E0E0; /* Custom scrollbar track color */
+    -fx-background-insets: 0;
+    -fx-background-radius: 5em;
+}
+
+
+.bencana-list-container {
+    -fx-background-color: white; /* Card-like background for the list */
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 8); /* Subtle shadow */
+}
+
+/* --- Existing styles (from login/register) juga harus ada di style.css untuk konsistensi --- */
+
+/* Form Card Styling (reused) */
+.form-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 30, 0, 0, 15);
+    -fx-padding: 30px;
+}
+
+/* Typography (reused) */
+.error-label {
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-alignment: center;
+    -fx-padding: 5px 0;
+}
+
+.input-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 7px;
+    -fx-background-radius: 7px;
+    -fx-padding: 12px 15px;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #999999;
+}
+
+.input-field:focused {
+    -fx-border-color: #007bff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 123, 255, 0.2), 10, 0, 0, 5);
+}
+
+.login-button {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px 25px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
+}
+
+.login-button:hover {
+    -fx-background-color: #0056b3;
+    -fx-cursor: hand;
+}
+
+.login-button:pressed {
+    -fx-background-color: #004085;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.register-button {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px 25px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
+}
+
+.register-button:hover {
+    -fx-background-color: #218838;
+    -fx-cursor: hand;
+}
+
+.register-button:pressed {
+    -fx-background-color: #1e7e34;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.login-text { /* Reused for "Belum punya akun?" */
+    -fx-text-fill: #666666;
+    -fx-font-size: 13px;
+}
+
+.login-link { /* Reused for "Daftar di sini" */
+    -fx-text-fill: #007bff;
+    -fx-underline: true;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.login-link:hover {
+    -fx-text-fill: #0056b3;
+    -fx-cursor: hand;
+}

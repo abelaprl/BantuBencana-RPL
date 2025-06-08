@@ -1,14 +1,13 @@
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader; // Import FXMLLoader
+import javafx.scene.Parent;   // Import Parent
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.IOException; // Import IOException
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+// import java.util.Random; // Tidak lagi dibutuhkan karena email diteruskan
 
 public class Dashboard extends Application {
 
@@ -22,7 +21,7 @@ public class Dashboard extends Application {
     public static List<DonationData> donationDatabase = new ArrayList<>();
 
     // DatabaseViewer instance
-    private static DatabaseViewer databaseViewer; // Anda mungkin perlu memperbarui DatabaseViewer juga
+    private static DatabaseViewer databaseViewer;
 
     // Tambahkan variabel untuk menyimpan email pengguna yang login
     private String currentUserEmail;
@@ -30,12 +29,14 @@ public class Dashboard extends Application {
     // Ubah tanda tangan method start untuk menerima userEmail
     @Override
     public void start(Stage primaryStage) {
-        start(primaryStage, null);
+        // Metode ini akan dipanggil tanpa email saat aplikasi pertama kali dijalankan oleh JavaFX Launcher.
+        // Panggil metode overloaded jika perlu.
+        start(primaryStage, null); // Panggil versi overloaded dengan email null atau kosong
     }
 
     // Overloaded start method untuk menerima email dari LoginController
     public void start(Stage primaryStage, String userEmail) {
-        this.currentUserEmail = userEmail;
+        this.currentUserEmail = userEmail; // Simpan email pengguna yang login
 
         // Load data dari file saat aplikasi dimulai
         DataManager.loadFeedbackData();
@@ -52,68 +53,31 @@ public class Dashboard extends Application {
             initializeDummyData();
         }
 
-        primaryStage.setTitle("Dashboard Pasca Bencana");
+        try {
+            // Memuat FXML file
+            // Pastikan "dashboardview.fxml" ada di lokasi yang dapat diakses oleh ClassLoader
+            // Misalnya, di folder yang sama dengan kelas Dashboard.java, atau di folder resources
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("dashboardview.fxml"));
+            Parent root = loader.load();
 
-        VBox root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(20));
+            // Mendapatkan controller dari FXML
+            DashboardController controller = loader.getController();
 
-        Label welcomeLabel = new Label("Selamat Datang di Sistem Bantu Bencana!");
-        welcomeLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;");
-        if (currentUserEmail != null && !currentUserEmail.isEmpty()) {
-            welcomeLabel.setText("Selamat Datang, " + currentUserEmail + "!");
-        }
-
-        Button laporButton = new Button("Lapor Bencana");
-        laporButton.setPrefSize(200, 50);
-        laporButton.setStyle("-fx-font-size: 16px; -fx-background-color: #007bff; -fx-text-fill: white; -fx-background-radius: 5;");
-        laporButton.setOnAction(e -> {
-            new LaporanBencana().start(new Stage());
-        });
-
-        Button feedbackButton = new Button("Berikan Feedback");
-        feedbackButton.setPrefSize(200, 50);
-        feedbackButton.setStyle("-fx-font-size: 16px; -fx-background-color: #28a745; -fx-text-fill: white; -fx-background-radius: 5;");
-        feedbackButton.setOnAction(e -> {
-            new Feedback().start(new Stage(), currentUserEmail);
-        });
-
-        Button donasiButton = new Button("Donasi Bencana"); // Ubah teks tombol
-        donasiButton.setPrefSize(200, 50);
-        donasiButton.setStyle("-fx-font-size: 16px; -fx-background-color: #6f42c1; -fx-text-fill: white; -fx-background-radius: 5;");
-        donasiButton.setOnAction(e -> {
-            // Membuka Halaman Donasi baru dan meneruskan email pengguna
-            new DonationPage(currentUserEmail).start(new Stage());
-        });
-
-        Button viewDatabaseButton = new Button("Lihat Database");
-        viewDatabaseButton.setPrefSize(200, 50);
-        viewDatabaseButton.setStyle("-fx-font-size: 16px; -fx-background-color: #ffc107; -fx-text-fill: #333; -fx-background-radius: 5;");
-        viewDatabaseButton.setOnAction(e -> {
-            if (databaseViewer == null) {
-                databaseViewer = new DatabaseViewer();
+            // Set email pengguna ke controller
+            if (controller != null) {
+                // Panggil method initData di DashboardController untuk meneruskan email
+                controller.initData(userEmail);
             }
-            databaseViewer.showStage();
-            databaseViewer.refreshData();
-        });
 
-        Button exitButton = new Button("Keluar");
-        exitButton.setPrefSize(200, 50);
-        exitButton.setStyle("-fx-font-size: 16px; -fx-background-color: #dc3545; -fx-text-fill: white; -fx-background-radius: 5;");
-        exitButton.setOnAction(e -> {
-            DataManager.saveFeedbackData();
-            DataManager.saveLaporanBencanaData();
-            DataManager.saveDonationData(); // Simpan data donasi saat keluar (BARU)
-            primaryStage.close();
-            System.out.println("Aplikasi ditutup. Data disimpan.");
-        });
+            primaryStage.setTitle("Dashboard Pasca Bencana");
+            Scene scene = new Scene(root, 1000, 700); // Sesuaikan ukuran Scene dengan ukuran FXML Anda (prefHeight, prefWidth)
+            primaryStage.setScene(scene);
+            primaryStage.show();
 
-        // Tambahkan tombol donasi ke dalam VBox
-        root.getChildren().addAll(welcomeLabel, laporButton, feedbackButton, donasiButton, viewDatabaseButton, exitButton);
-
-        Scene scene = new Scene(root, 600, 500);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Gagal memuat dashboardview.fxml: " + e.getMessage());
+        }
     }
 
     public static void addFeedback(FeedbackData feedback) {
@@ -167,7 +131,6 @@ public class Dashboard extends Application {
         System.out.println("Donasi baru ditambahkan ke database!");
 
         if (databaseViewer != null) {
-            // Anda mungkin perlu memperbarui DatabaseViewer agar bisa menampilkan donasi
             databaseViewer.refreshData();
         }
     }
