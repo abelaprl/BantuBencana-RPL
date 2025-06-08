@@ -5,59 +5,42 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" spacing="20.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RegisterController">
-   <padding>
-      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-   </padding>
-   <children>
-      <Text fill="#333333" strokeType="OUTSIDE" strokeWidth="0.0" text="Daftar Akun Baru">
-         <font>
-            <Font name="Arial Bold" size="24.0" />
-         </font>
-      </Text>
-      <Label fx:id="errorMessageLabel" textFill="#ff0000">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <TextField fx:id="usernameField" promptText="Username">
-         <VBox.margin>
-            <Insets left="50.0" right="50.0" />
-         </VBox.margin>
-      </TextField>
-      <TextField fx:id="emailField" promptText="Email">
-         <VBox.margin>
-            <Insets left="50.0" right="50.0" />
-         </VBox.margin>
-      </TextField>
-      <PasswordField fx:id="passwordField" promptText="Password">
-         <VBox.margin>
-            <Insets left="50.0" right="50.0" />
-         </VBox.margin>
-      </PasswordField>
-      <PasswordField fx:id="confirmPasswordField" promptText="Konfirmasi Password">
-         <VBox.margin>
-            <Insets left="50.0" right="50.0" />
-         </VBox.margin>
-      </PasswordField>
-      <Button mnemonicParsing="false" onAction="#handleRegister" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 16px; -fx-background-radius: 5;" text="Daftar">
-         <VBox.margin>
-            <Insets top="10.0" />
-         </VBox.margin>
-      </Button>
-      <HBox alignment="CENTER" spacing="5.0">
-         <children>
-            <Label text="Sudah punya akun?">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Label>
-            <Hyperlink onAction="#handleLoginLink" text="Login di sini">
-               <font>
-                  <Font size="12.0" />
-               </font>
-            </Hyperlink>
-         </children>
-      </HBox>
-   </children>
-</VBox>
+<StackPane alignment="CENTER" prefHeight="500.0" prefWidth="700.0" styleClass="root-pane" stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RegisterController">
+    <children>
+        <VBox alignment="CENTER" maxWidth="450.0" minWidth="350.0" spacing="10.0" styleClass="form-card">
+            <padding>
+                <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+            </padding>
+            <children>
+                <Text fill="#333333" strokeType="OUTSIDE" strokeWidth="0.0" text="Daftar Akun Baru" styleClass="title-text">
+                    <VBox.margin>
+                        <Insets bottom="0.0" />
+                    </VBox.margin>
+                </Text>
+                <Label fx:id="errorMessageLabel" textFill="#e74c3c" alignment="CENTER" prefWidth="Infinity" styleClass="error-label">
+                    <VBox.margin>
+                        <Insets bottom="5.0" />
+                    </VBox.margin>
+                </Label>
+                <TextField fx:id="usernameField" promptText="Username" styleClass="input-field" />
+                <TextField fx:id="emailField" promptText="Email" styleClass="input-field" />
+                <PasswordField fx:id="passwordField" promptText="Password" styleClass="input-field" />
+                <PasswordField fx:id="confirmPasswordField" promptText="Konfirmasi Password" styleClass="input-field" />
+                <Button mnemonicParsing="false" onAction="#handleRegister" prefHeight="45.0" prefWidth="250.0" text="Daftar" styleClass="register-button">
+                    <VBox.margin>
+                        <Insets top="20.0" />
+                    </VBox.margin>
+                </Button>
+                <HBox alignment="CENTER" spacing="5.0">
+                    <children>
+                        <Label text="Sudah punya akun?" styleClass="login-text" />
+                        <Hyperlink onAction="#handleLoginLink" text="Login di sini" styleClass="login-link" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="5.0" />
+                    </VBox.margin>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</StackPane>

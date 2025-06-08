@@ -1,0 +1,108 @@
+/* --- Login Button Styling (Tambahan/Pastikan ada) --- */
+.login-button {
+    -fx-background-color: #007bff; /* Biru yang konsisten */
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px 25px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
+}
+
+.login-button:hover {
+    -fx-background-color: #0056b3; /* Biru lebih gelap saat hover */
+    -fx-cursor: hand;
+}
+
+.login-button:pressed {
+    -fx-background-color: #004085; /* Biru paling gelap saat ditekan */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+/* --- Pastikan Style berikut sudah ada dan konsisten dengan RegisterView.fxml --- */
+
+/* Global Styles */
+.root-pane {
+    -fx-background-color: linear-gradient(to bottom right, #e0e5ec, #f0f2f5);
+}
+
+/* Form Card Styling */
+.form-card {
+    -fx-background-color: white; /* Tetap putih */
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 30, 0, 0, 15);
+    -fx-padding: 30px;
+}
+
+/* Typography */
+.title-text {
+    -fx-font-family: "Arial", "Helvetica Neue", sans-serif;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-fill: #333333;
+    -fx-text-alignment: center;
+}
+
+.error-label {
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-alignment: center;
+    -fx-padding: 5px 0;
+}
+
+.login-text {
+    -fx-text-fill: #666666;
+    -fx-font-size: 13px;
+}
+
+.login-link {
+    -fx-text-fill: #007bff;
+    -fx-underline: true;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.login-link:hover {
+    -fx-text-fill: #0056b3;
+    -fx-cursor: hand;
+}
+
+/* Input Fields Styling */
+.input-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 7px;
+    -fx-background-radius: 7px;
+    -fx-padding: 12px 15px;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #999999;
+}
+
+.input-field:focused {
+    -fx-border-color: #007bff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 123, 255, 0.2), 10, 0, 0, 5);
+}
+
+/* Register Button Styling (jika Anda memiliki halaman register terpisah yang menggunakan ini) */
+.register-button {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px 25px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5);
+}
+
+.register-button:hover {
+    -fx-background-color: #218838;
+    -fx-cursor: hand;
+}
+
+.register-button:pressed {
+    -fx-background-color: #1e7e34;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
