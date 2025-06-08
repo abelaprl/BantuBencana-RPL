@@ -1,0 +1,8 @@
+com\bantubencana\controller\RegisterController.class
+com\bantubencana\MainApp.class
+com\bantubencana\controller\HomeController.class
+com\bantubencana\model\User.class
+service\FirebaseAuthService.class
+com\bantubencana\model\User$Role.class
+com\bantubencana\util\FirebaseUtil.class
+com\bantubencana\controller\LoginController.class

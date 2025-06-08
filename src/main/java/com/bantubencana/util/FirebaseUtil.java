@@ -10,6 +10,10 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.google.cloud.firestore.Firestore;
 import com.bantubencana.model.User; // Import the User model
 
+import com.google.firebase.ErrorCode;
+import com.google.firebase.auth.AuthErrorCode;
+import com.google.firebase.auth.FirebaseAuthException;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -28,7 +32,7 @@ public class FirebaseUtil {
 
                 FirebaseOptions options = new FirebaseOptions.Builder()
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .setDatabaseUrl("https://bantubencana-cd05c.firebaseio.com") // Ganti dengan URL database Anda jika ada
+                        .setDatabaseUrl("https://bantubencana-cd05c") // Ganti dengan URL database Anda jika ada
                         .build();
 
                 firebaseApp = FirebaseApp.initializeApp(options);
@@ -100,10 +104,10 @@ public class FirebaseUtil {
                 System.out.println("User " + email + " logged in successfully.");
                 return userFromFirestore;
             } else {
-                throw new FirebaseAuthException("auth/wrong-password", "Invalid credentials.");
+                throw new FirebaseAuthException(ErrorCode.INVALID_ARGUMENT, "Invalid credentials.", null, null, null);
             }
         } catch (InterruptedException | ExecutionException e) {
-            throw new FirebaseAuthException("auth/user-not-found", "User not found or other error.");
+            throw new FirebaseAuthException(ErrorCode.NOT_FOUND, "User not found or other error.", null, null, null);
         }
     }
 
