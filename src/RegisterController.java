@@ -1,5 +1,3 @@
-// File: src/RegisterController.java
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -7,6 +5,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.Node;
+import java.io.IOException;
 
 // PASTIKAN HANYA ADA public class RegisterController DI FILE INI
 public class RegisterController {
@@ -59,7 +58,12 @@ public class RegisterController {
 
         if (primaryStage != null) {
             ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
-            Main.showLoginView();
+            try {
+                Main.showLoginView();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Error navigating to login view.");
+            }
         }
     }
 
@@ -68,7 +72,12 @@ public class RegisterController {
         System.out.println("Navigasi kembali ke halaman login.");
         if (primaryStage != null) {
             ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
-            Main.showLoginView();
+            try {
+                Main.showLoginView();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Error navigating to login view.");
+            }
         }
     }
 

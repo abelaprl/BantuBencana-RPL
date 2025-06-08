@@ -1,17 +1,13 @@
 // src/UserController.java
-import com.bantubencana.model.User; // Tetap import model jika ada di package berbeda
-import com.bantubencana.repository.UserRepository; // Tetap import repository
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.event.ActionEvent; // Import ActionEvent
+import javafx.event.ActionEvent;
 
 import java.io.IOException;
-import java.util.Optional;
 
-public class UserController { // Ganti nama kelas menjadi UserController
+public class UserController {
 
     // Fields untuk Login
     @FXML private TextField loginEmailField;
@@ -24,12 +20,11 @@ public class UserController { // Ganti nama kelas menjadi UserController
     @FXML private PasswordField registerConfirmPasswordField;
     @FXML private Label registerMessageLabel;
 
-
     private UserRepository userRepository = new UserRepository();
 
     // --- Metode untuk Login ---
     @FXML
-    private void handleLogin(ActionEvent event) { // Perhatikan parameter ActionEvent
+    private void handleLogin(ActionEvent event) {
         String email = loginEmailField.getText();
         String password = loginPasswordField.getText();
 
@@ -38,31 +33,25 @@ public class UserController { // Ganti nama kelas menjadi UserController
             return;
         }
 
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = userRepository.authenticateByEmail(email, password);
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            if (user.getPassword().equals(password)) {
-                loginMessageLabel.setText("Login berhasil!");
-                loginMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
-                System.out.println("Logged in as: " + user.getEmail());
-                // Contoh: Navigasi ke dashboard setelah login berhasil
-                // try {
-                //     Main.showDashboardView(user.getEmail());
-                // } catch (IOException e) {
-                //     e.printStackTrace();
-                //     loginMessageLabel.setText("Error loading dashboard.");
-                // }
-            } else {
-                loginMessageLabel.setText("Password salah.");
+        if (user != null) {
+            loginMessageLabel.setText("Login berhasil!");
+            loginMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
+            System.out.println("Logged in as: " + user.getEmail());
+            try {
+                Main.showDashboardView();
+            } catch (IOException e) {
+                e.printStackTrace();
+                loginMessageLabel.setText("Error loading dashboard.");
             }
         } else {
-            loginMessageLabel.setText("User tidak ditemukan.");
+            loginMessageLabel.setText("Email atau password salah.");
         }
     }
 
     @FXML
-    private void handleRegisterRedirect(ActionEvent event) { // Perhatikan parameter ActionEvent
+    private void handleRegisterRedirect(ActionEvent event) {
         try {
             Main.showRegisterView();
         } catch (IOException e) {
@@ -73,7 +62,7 @@ public class UserController { // Ganti nama kelas menjadi UserController
 
     // --- Metode untuk Register ---
     @FXML
-    private void handleRegister(ActionEvent event) { // Perhatikan parameter ActionEvent
+    private void handleRegister(ActionEvent event) {
         String email = registerEmailField.getText();
         String password = registerPasswordField.getText();
         String confirmPassword = registerConfirmPasswordField.getText();
@@ -88,30 +77,24 @@ public class UserController { // Ganti nama kelas menjadi UserController
             return;
         }
 
-        Optional<User> existingUser = userRepository.findByEmail(email);
-        if (existingUser.isPresent()) {
+        if (userRepository.isEmailTaken(email)) {
             registerMessageLabel.setText("Email sudah terdaftar.");
             return;
         }
 
-        User newUser = new User(email, password);
-        userRepository.save(newUser);
+        User newUser = new User(email, password, email); // username, password, email
+        userRepository.register(newUser);
         registerMessageLabel.setText("Pendaftaran berhasil! Silakan login.");
         registerMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
 
-        // Bersihkan kolom atau otomatis arahkan ke halaman login
+        // Bersihkan kolom
         registerEmailField.clear();
         registerPasswordField.clear();
         registerConfirmPasswordField.clear();
-        // try {
-        //     Main.showLoginView();
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
     }
 
     @FXML
-    private void handleLoginRedirect(ActionEvent event) { // Perhatikan parameter ActionEvent
+    private void handleLoginRedirect(ActionEvent event) {
         try {
             Main.showLoginView();
         } catch (IOException e) {

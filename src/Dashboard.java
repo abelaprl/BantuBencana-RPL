@@ -18,8 +18,11 @@ public class Dashboard extends Application {
     // Database global untuk menyimpan laporan bencana
     public static List<LaporanBencanaData> laporanBencanaDatabase = new ArrayList<>();
 
+    // Database global untuk menyimpan donasi (BARU DITAMBAHKAN)
+    public static List<DonationData> donationDatabase = new ArrayList<>();
+
     // DatabaseViewer instance
-    private static DatabaseViewer databaseViewer;
+    private static DatabaseViewer databaseViewer; // Anda mungkin perlu memperbarui DatabaseViewer juga
 
     // Tambahkan variabel untuk menyimpan email pengguna yang login
     private String currentUserEmail;
@@ -27,22 +30,22 @@ public class Dashboard extends Application {
     // Ubah tanda tangan method start untuk menerima userEmail
     @Override
     public void start(Stage primaryStage) {
-        // Metode ini akan dipanggil tanpa email saat aplikasi pertama kali dijalankan oleh JavaFX Launcher.
-        // Panggil metode overloaded jika perlu.
-        start(primaryStage, null); // Panggil versi overloaded dengan email null atau kosong
+        start(primaryStage, null);
     }
 
     // Overloaded start method untuk menerima email dari LoginController
     public void start(Stage primaryStage, String userEmail) {
-        this.currentUserEmail = userEmail; // Simpan email pengguna yang login
+        this.currentUserEmail = userEmail;
 
         // Load data dari file saat aplikasi dimulai
         DataManager.loadFeedbackData();
         DataManager.loadLaporanBencanaData();
+        DataManager.loadDonationData(); // Load data donasi (BARU)
 
         System.out.println("Dashboard started. Database loaded from files.");
         System.out.println("Total Laporan Bencana: " + laporanBencanaDatabase.size());
         System.out.println("Total Feedback: " + feedbackDatabase.size());
+        System.out.println("Total Donasi: " + donationDatabase.size()); // Log total donasi (BARU)
 
         // Initialize dummy data jika database kosong
         if (laporanBencanaDatabase.isEmpty()) {
@@ -61,7 +64,6 @@ public class Dashboard extends Application {
             welcomeLabel.setText("Selamat Datang, " + currentUserEmail + "!");
         }
 
-
         Button laporButton = new Button("Lapor Bencana");
         laporButton.setPrefSize(200, 50);
         laporButton.setStyle("-fx-font-size: 16px; -fx-background-color: #007bff; -fx-text-fill: white; -fx-background-radius: 5;");
@@ -73,8 +75,15 @@ public class Dashboard extends Application {
         feedbackButton.setPrefSize(200, 50);
         feedbackButton.setStyle("-fx-font-size: 16px; -fx-background-color: #28a745; -fx-text-fill: white; -fx-background-radius: 5;");
         feedbackButton.setOnAction(e -> {
-            // Gunakan email pengguna yang login
             new Feedback().start(new Stage(), currentUserEmail);
+        });
+
+        Button donasiButton = new Button("Donasi Bencana"); // Ubah teks tombol
+        donasiButton.setPrefSize(200, 50);
+        donasiButton.setStyle("-fx-font-size: 16px; -fx-background-color: #6f42c1; -fx-text-fill: white; -fx-background-radius: 5;");
+        donasiButton.setOnAction(e -> {
+            // Membuka Halaman Donasi baru dan meneruskan email pengguna
+            new DonationPage(currentUserEmail).start(new Stage());
         });
 
         Button viewDatabaseButton = new Button("Lihat Database");
@@ -84,7 +93,7 @@ public class Dashboard extends Application {
             if (databaseViewer == null) {
                 databaseViewer = new DatabaseViewer();
             }
-            databaseViewer.showStage(); // Mengganti show() dengan showStage()
+            databaseViewer.showStage();
             databaseViewer.refreshData();
         });
 
@@ -94,11 +103,13 @@ public class Dashboard extends Application {
         exitButton.setOnAction(e -> {
             DataManager.saveFeedbackData();
             DataManager.saveLaporanBencanaData();
+            DataManager.saveDonationData(); // Simpan data donasi saat keluar (BARU)
             primaryStage.close();
             System.out.println("Aplikasi ditutup. Data disimpan.");
         });
 
-        root.getChildren().addAll(welcomeLabel, laporButton, feedbackButton, viewDatabaseButton, exitButton);
+        // Tambahkan tombol donasi ke dalam VBox
+        root.getChildren().addAll(welcomeLabel, laporButton, feedbackButton, donasiButton, viewDatabaseButton, exitButton);
 
         Scene scene = new Scene(root, 600, 500);
         primaryStage.setScene(scene);
@@ -149,12 +160,17 @@ public class Dashboard extends Application {
         }
     }
 
-    // Hapus metode getCurrentUserEmail() karena kita akan menggunakan email yang diteruskan
-    // public static String getCurrentUserEmail() {
-    //     Random random = new Random();
-    //     int userNumber = random.nextInt(1000) + 1;
-    //     return "user" + userNumber + "@example.com";
-    // }
+    // Metode baru untuk menambahkan donasi (BARU DITAMBAHKAN)
+    public static void addDonation(DonationData donation) {
+        donationDatabase.add(donation);
+        DataManager.saveDonationData();
+        System.out.println("Donasi baru ditambahkan ke database!");
+
+        if (databaseViewer != null) {
+            // Anda mungkin perlu memperbarui DatabaseViewer agar bisa menampilkan donasi
+            databaseViewer.refreshData();
+        }
+    }
 
     public static List<FeedbackData> getAllFeedback() {
         return feedbackDatabase;
@@ -162,6 +178,11 @@ public class Dashboard extends Application {
 
     public static List<LaporanBencanaData> getAllLaporanBencana() {
         return laporanBencanaDatabase;
+    }
+
+    // Metode baru untuk mendapatkan semua donasi (BARU DITAMBAHKAN)
+    public static List<DonationData> getAllDonations() {
+        return donationDatabase;
     }
 
     public static void initializeDummyData() {

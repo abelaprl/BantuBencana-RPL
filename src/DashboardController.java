@@ -133,6 +133,14 @@ public class DashboardController implements Initializable {
 
         HBox buttonBox = new HBox(10);
         Button detailButton = new Button("Lihat Detail");
+        detailButton.setOnAction(e -> {
+            try {
+                Main.showDetailLaporan(bencana);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                System.err.println("ERROR: Gagal membuka detail laporan.");
+            }
+        });
         Button donasiButton = new Button("Donasi");
         buttonBox.getChildren().addAll(detailButton, donasiButton);
 
@@ -149,6 +157,17 @@ public class DashboardController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("ERROR: Gagal kembali ke halaman login.");
+        }
+    }
+
+    @FXML
+    private void handleLaporanBencana(ActionEvent event) {
+        try {
+            System.out.println("DEBUG: Navigating to Laporan Bencana list.");
+            Main.showLaporanList();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("ERROR: Gagal membuka halaman laporan bencana.");
         }
     }
 }

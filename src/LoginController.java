@@ -7,6 +7,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 
+import java.io.IOException;
+
 public class LoginController {
 
     @FXML
@@ -38,8 +40,13 @@ public class LoginController {
             if (primaryStage != null) {
                 ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
 
-                Dashboard dashboard = new Dashboard();
-                dashboard.start(new Stage(), user.getEmail());
+                try {
+                    Dashboard dashboard = new Dashboard();
+                    dashboard.start(new Stage(), user.getEmail());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println("Error starting dashboard: " + e.getMessage());
+                }
             }
 
         } else {
@@ -52,7 +59,12 @@ public class LoginController {
         System.out.println("Navigasi ke halaman registrasi.");
         if (primaryStage != null) {
             ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
-            Main.showRegisterView();
+            try {
+                Main.showRegisterView();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Error navigating to register view: " + e.getMessage());
+            }
         }
     }
 }

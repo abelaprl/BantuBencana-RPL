@@ -22,6 +22,7 @@ public class DatabaseViewer {
     private TabPane tabPane;
     private VBox feedbackContent;
     private VBox laporanContent;
+    private VBox donationContent; // BARU: VBox untuk konten donasi
 
     public DatabaseViewer() {
         stage = new Stage();
@@ -47,7 +48,18 @@ public class DatabaseViewer {
         laporanScrollPane.setFitToWidth(true);
         laporanTab.setContent(laporanScrollPane);
 
-        tabPane.getTabs().addAll(feedbackTab, laporanTab);
+        // BARU: Tab untuk Donasi
+        Tab donationTab = new Tab("Donasi");
+        donationTab.setClosable(false);
+        donationContent = new VBox(10);
+        donationContent.setPadding(new Insets(10));
+        ScrollPane donationScrollPane = new ScrollPane(donationContent);
+        donationScrollPane.setFitToWidth(true);
+        donationTab.setContent(donationScrollPane);
+
+
+        // Tambahkan semua tab ke TabPane
+        tabPane.getTabs().addAll(feedbackTab, laporanTab, donationTab); // BARU: Tambahkan donationTab
 
         Scene scene = new Scene(tabPane, 800, 600);
         stage.setScene(scene);
@@ -58,12 +70,17 @@ public class DatabaseViewer {
                 refreshFeedbackList();
             } else if (newTab == laporanTab) {
                 refreshLaporanList();
+            } else if (newTab == donationTab) { // BARU: Tambahkan logika untuk tab donasi
+                refreshDonationList();
             }
         });
+
+        // Pastikan data dimuat saat pertama kali DatabaseViewer dibuka
+        refreshData();
     }
 
     // Metode untuk menampilkan stage
-    public void showStage() { // Ubah nama dari show() menjadi showStage() untuk menghindari konflik
+    public void showStage() {
         stage.show();
     }
 
@@ -72,9 +89,11 @@ public class DatabaseViewer {
         stage.hide();
     }
 
+    // Metode untuk me-refresh semua data di semua tab
     public void refreshData() {
         refreshFeedbackList();
         refreshLaporanList();
+        refreshDonationList(); // BARU: Refresh data donasi
     }
 
     private void refreshFeedbackList() {
@@ -95,10 +114,10 @@ public class DatabaseViewer {
     private HBox createFeedbackBox(FeedbackData feedback, int index) {
         HBox box = new HBox(10);
         box.setPadding(new Insets(10));
-        box.setStyle("-fx-background-color: #e6f7ff; -fx-background-radius: 5;"); // Warna sedikit berbeda
+        box.setStyle("-fx-background-color: #e6f7ff; -fx-background-radius: 5;");
 
         VBox detailsBox = new VBox(5);
-        detailsBox.setPrefWidth(650); // Sesuaikan lebar
+        detailsBox.setPrefWidth(650);
         detailsBox.getChildren().addAll(
             new Label("Laporan: " + feedback.getLaporanBencana()),
             new Label("Jenis: " + feedback.getJenisBencana()),
@@ -118,7 +137,6 @@ public class DatabaseViewer {
             new Label("Evaluasi Tambahan: " + feedback.getEvaluasiTambahan())
         );
 
-        // Tambahkan gambar jika ada media pendukung
         if (feedback.getMediaPendukungPath() != null && !feedback.getMediaPendukungPath().isEmpty()) {
             File imageFile = new File(feedback.getMediaPendukungPath());
             if (imageFile.exists()) {
@@ -190,6 +208,71 @@ public class DatabaseViewer {
         deleteButton.setOnAction(e -> {
             Dashboard.removeLaporanBencanaFromDatabase(index);
             refreshLaporanList();
+        });
+
+        actionsBox.getChildren().add(deleteButton);
+        box.getChildren().addAll(detailsBox, actionsBox);
+        return box;
+    }
+
+    // BARU: Metode untuk me-refresh daftar donasi
+    private void refreshDonationList() {
+        donationContent.getChildren().clear();
+        List<DonationData> donationList = Dashboard.getAllDonations(); // Mengambil data donasi
+        if (donationList == null || donationList.isEmpty()) {
+            donationContent.getChildren().add(new Label("Belum ada data donasi."));
+            return;
+        }
+
+        for (int i = 0; i < donationList.size(); i++) {
+            DonationData donation = donationList.get(i);
+            HBox donationBox = createDonationBox(donation, i);
+            donationContent.getChildren().add(donationBox);
+        }
+    }
+
+    // BARU: Metode untuk membuat HBox tampilan untuk satu data donasi
+    private HBox createDonationBox(DonationData donation, int index) {
+        HBox box = new HBox(10);
+        box.setPadding(new Insets(10));
+        box.setStyle("-fx-background-color: #fff0f5; -fx-background-radius: 5;"); // Warna pink muda
+
+        VBox detailsBox = new VBox(5);
+        detailsBox.setPrefWidth(650);
+        detailsBox.getChildren().addAll(
+            new Label("Bencana: " + donation.getDisasterType() + " di " + donation.getLocation()),
+            new Label("Jenis Donasi: " + donation.getDonationType()),
+            new Label("Jumlah/Deskripsi: " + donation.getAmountOrDescription()),
+            new Label("Email Donor: " + donation.getDonorEmail()),
+            new Label("Waktu Donasi: " + donation.getTimestamp())
+        );
+
+        VBox actionsBox = new VBox(10);
+        actionsBox.setAlignment(Pos.CENTER);
+
+        Button deleteButton = new Button("Hapus");
+        deleteButton.setStyle("-fx-background-color: #ff6b6b;");
+        deleteButton.setOnAction(e -> {
+            // Anda perlu menambahkan metode removeDonationFromDatabase di Dashboard
+            // Dashboard.removeDonationFromDatabase(index); // Ini akan menyebabkan error jika belum ada
+            // Untuk sementara, kita bisa menghapus dari list lokal dan refresh.
+            // Namun, untuk persistensi yang benar, Anda butuh metode di Dashboard dan DataManager.
+            // Saya asumsikan Anda akan menambahkan ini di Dashboard nanti.
+            // Jika Anda sudah menambahkan Dashboard.removeDonationFromDatabase(index); maka uncomment baris di bawah
+            // Dashboard.removeDonationFromDatabase(index);
+            // Dan pastikan DataManager.saveDonationData() dipanggil setelah penghapusan.
+
+            // Solusi sementara jika Anda belum punya removeDonationFromDatabase di Dashboard:
+            // Ini akan menghapus dari tampilan tapi tidak dari file/database.
+            // Untuk solusi yang persist, Anda harus buat method di Dashboard dan DataManager.
+            // Sebagai solusi sementara, jika Anda belum menambahkan method di Dashboard untuk menghapus donasi:
+            List<DonationData> currentDonations = Dashboard.getAllDonations();
+            if (index >= 0 && index < currentDonations.size()) {
+                currentDonations.remove(index);
+                DataManager.saveDonationData(); // Pastikan data disimpan setelah dihapus
+                System.out.println("Donasi berhasil dihapus dari database (sementara)!");
+            }
+            refreshDonationList();
         });
 
         actionsBox.getChildren().add(deleteButton);

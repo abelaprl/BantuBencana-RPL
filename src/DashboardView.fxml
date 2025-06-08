@@ -37,7 +37,7 @@
             </Label>
             <VBox spacing="10.0" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                 <Button text="Home" prefWidth="230.0" alignment="CENTER_LEFT" style="-fx-background-color: #3CB371; -fx-text-fill: white;" />
-                <Button text="Laporan Bencana" prefWidth="230.0" alignment="CENTER_LEFT" style="-fx-background-color: transparent; -fx-text-fill: white;" />
+                <Button text="Laporan Bencana" prefWidth="230.0" alignment="CENTER_LEFT" style="-fx-background-color: transparent; -fx-text-fill: white;" onAction="#handleLaporanBencana" />
                 <Button text="Donasi" prefWidth="230.0" alignment="CENTER_LEFT" style="-fx-background-color: transparent; -fx-text-fill: white;" />
                 <Button text="Relawan" prefWidth="230.0" alignment="CENTER_LEFT" style="-fx-background-color: transparent; -fx-text-fill: white;" />
                 <Button text="Instruksi" prefWidth="230.0" alignment="CENTER_LEFT" style="-fx-background-color: transparent; -fx-text-fill: white;" />
