@@ -72,7 +72,7 @@ public class DetailLaporanController implements Initializable {
                 imageView.setStyle("-fx-background-color: #e0e0e0; -fx-background-radius: 8;");
                 
                 // Try to load actual disaster images
-                String imagePath = "/BantuBencana-RPL/img/bencana_photos/bencana_" + 
+                String imagePath = "/BantuBencana-RPL/img/bencana_photos/" + 
                     (i == 0 ? "jakarta" : "lombok") + ".jpg";
                 URL imageUrl = getClass().getResource(imagePath);
                 if (imageUrl != null) {
