@@ -81,95 +81,34 @@ public class DashboardController implements Initializable {
         String relativePathForImage = "img/bencana_photos/" + namaFileGambarDariObjek;
         // String relativePathForImage = namaFileGambarDariObjek;
         System.out.println("DEBUG: Path relatif yang dicoba untuk gambar: '" + relativePathForImage + "'");
-//         File file = new File("img/bencana_photos/" + namaFileGambarDariObjek);
-// System.out.println("Ada file? " + file.exists());
-// System.out.println("Absolute path: " + file.getAbsolutePath());
 
-// BufferedImage img = null;
-
-// try {
-//     img = ImageIO.read(file);
-//     // proses gambar kalau perlu
-// } catch (IOException e) {
-//     e.printStackTrace();
-//     // atau tampilkan error ke UI/log
-// }
-
-// if (img == null) {
-//     System.out.println("Gagal load gambar: Format tidak dikenali.");
-// } else {
-//     System.out.println("Berhasil load gambar!");
-// }
-
-File file = new File("img/bencana_photos/" + namaFileGambarDariObjek);
-if (file.exists()) {
-    System.out.println("DEBUG: Load gambar dari file system langsung.");
-    Image image = new Image(file.toURI().toString());
-    if (image.isError()) {
-        System.err.println("ERROR: Gambar gagal dimuat: " + image.getException());
-        Label errorLabel = new Label("Gambar rusak atau tidak dapat dimuat: " + namaFileGambarDariObjek);
-        errorLabel.setTextFill(Color.RED);
-        errorLabel.setFont(new Font(12));
-        imageView.setFitWidth(570);
-        imageView.setFitHeight(100);
-        card.getChildren().add(errorLabel);
-    } else {
-        imageView.setImage(image);
-        imageView.setFitWidth(570);
-        imageView.setFitHeight(200);
-        imageView.setPreserveRatio(false);
-    }
-} else {
-    System.err.println("ERROR: Gambar tidak ditemukan di lokasi: " + file.getAbsolutePath());
-    Label errorLabel = new Label("Gambar tidak ditemukan: " + namaFileGambarDariObjek);
-    errorLabel.setTextFill(Color.RED);
-    errorLabel.setFont(new Font(12));
-    imageView.setFitWidth(570);
-    imageView.setFitHeight(100);
-    card.getChildren().add(errorLabel);
-}
-
-
-        // URL imageUrl = getClass().getResource(relativePathForImage);
-
-        // if (imageUrl != null) {
-        //     System.out.println("DEBUG: Gambar DITEMUKAN di URL: " + imageUrl.toExternalForm());
-        //     try {
-        //         Image image = new Image(imageUrl.toExternalForm());
-        //         if (image.isError()) {
-        //             System.err.println("ERROR: Gambar gagal dimuat setelah ditemukan URL. Pesan error: " + image.exceptionProperty().get().getMessage());
-        //             Label errorLabel = new Label("Gambar rusak atau tidak dapat dimuat: " + namaFileGambarDariObjek);
-        //             errorLabel.setTextFill(Color.RED);
-        //             errorLabel.setFont(new Font(12));
-        //             imageView.setFitWidth(570);
-        //             imageView.setFitHeight(100);
-        //             card.getChildren().add(errorLabel);
-        //         } else {
-        //             imageView.setImage(image);
-        //             imageView.setFitWidth(570);
-        //             imageView.setFitHeight(200);
-        //             imageView.setPreserveRatio(false);
-        //         }
-        //     } catch (Exception e) {
-        //         System.err.println("ERROR: Pengecualian saat membuat objek Image: " + e.getMessage());
-        //         Label errorLabel = new Label("Error memuat gambar: " + namaFileGambarDariObjek);
-        //         errorLabel.setTextFill(Color.RED);
-        //         errorLabel.setFont(new Font(12));
-        //         imageView.setFitWidth(570);
-        //         imageView.setFitHeight(100);
-        //         card.getChildren().add(errorLabel);
-        //     }
-        // } else {
-        //     System.err.println("ERROR: Gambar TIDAK DITEMUKAN di path: '" + relativePathForImage + "'");
-        //     System.err.println("DEBUG: Current working directory (saat java dijalankan) kemungkinan di 'D:\\TUGAS SEM 5\\BantuBencana-RPL\\src' (jika Anda menjalankan dari IDE)");
-        //     System.err.println("DEBUG: Pastikan file gambar ada di folder 'resources' Anda, misal: 'src/main/resources/img/bencana_photos/" + namaFileGambarDariObjek + "'");
-        //     Label errorLabel = new Label("Gambar tidak ditemukan: " + namaFileGambarDariObjek);
-        //     errorLabel.setTextFill(Color.RED);
-        //     errorLabel.setFont(new Font(12));
-        //     imageView.setFitWidth(570);
-        //     imageView.setFitHeight(100);
-        //     card.getChildren().add(errorLabel);
-        // }
+        File file = new File("img/bencana_photos/" + namaFileGambarDariObjek);
+        if (file.exists()) {
+            System.out.println("DEBUG: Load gambar dari file system langsung.");
+            Image image = new Image(file.toURI().toString());
+            if (image.isError()) {
+                System.err.println("ERROR: Gambar gagal dimuat: " + image.getException());
+                Label errorLabel = new Label("Gambar rusak atau tidak dapat dimuat: " + namaFileGambarDariObjek);
+                errorLabel.setTextFill(Color.RED);
+                errorLabel.setFont(new Font(12));
+                imageView.setFitWidth(570);
+                imageView.setFitHeight(100);
+                card.getChildren().add(errorLabel);
+            } else {
+                imageView.setImage(image);
+                imageView.setFitWidth(570);
+                imageView.setFitHeight(200);
+                imageView.setPreserveRatio(false);
+            }
+        } else {
+            System.err.println("ERROR: Gambar tidak ditemukan di lokasi: " + file.getAbsolutePath());
+            Label errorLabel = new Label("Gambar tidak ditemukan: " + namaFileGambarDariObjek);
+            errorLabel.setTextFill(Color.RED);
+            errorLabel.setFont(new Font(12));
+            imageView.setFitWidth(570);
+            imageView.setFitHeight(100);
+            card.getChildren().add(errorLabel);
+        }
 
         Label judulLabel = new Label(bencana.getJudul());
         judulLabel.setFont(new Font("System Bold", 18));
@@ -257,4 +196,16 @@ if (file.exists()) {
             System.err.println("ERROR: Gagal membuka halaman donasi.");
         }
     }
+    
+    @FXML
+    private void handleLihatSemuaLaporan(ActionEvent event) {
+        try {
+            System.out.println("DEBUG: Navigating to Laporan List View.");
+            Main.showLaporanList(); // Memanggil method dari Main.java
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("ERROR: Gagal membuka halaman daftar laporan.");
+        }
+    }
+
 }
