@@ -44,7 +44,7 @@ echo.
 
 REM --- CHANGE THIS LINE ---
 REM Specify the classpath using -cp or --class-path to include the 'src' directory, adding javafx.media module
-java --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -cp src Main
+java --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -cp src Dashboard
 if errorlevel 1 (
     echo ❌ Application run error.
     echo Please check the error messages above for details.

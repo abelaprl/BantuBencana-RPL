@@ -1,0 +1,56 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Dashboard",
+            "request": "launch",
+            "mainClass": "Dashboard",
+            "projectName": "BantuBencana-RPL_5385856"
+        },
+        {
+            "type": "java",
+            "name": "DonationPage",
+            "request": "launch",
+            "mainClass": "DonationPage",
+            "projectName": "BantuBencana-RPL_5385856"
+        },
+        {
+            "type": "java",
+            "name": "Feedback",
+            "request": "launch",
+            "mainClass": "Feedback",
+            "projectName": "BantuBencana-RPL_5385856"
+        },
+        {
+            "type": "java",
+            "name": "LaporanBencana",
+            "request": "launch",
+            "mainClass": "LaporanBencana",
+            "projectName": "BantuBencana-RPL_5385856"
+        },
+        {
+            "type": "java",
+            "name": "Main", // Ini adalah konfigurasi yang akan kita modifikasi
+            "request": "launch",
+            "mainClass": "Main", // Pastikan ini adalah kelas utama JavaFX Anda
+            "projectName": "BantuBencana-RPL_5385856",
+            "preLaunchTask": "compileAndPrepareJavaFX", // <-- Tambahkan ini! Harus sama dengan 'label' di tasks.json
+            "vmArgs": "--module-path \"C:/path/to/javafx-sdk-21/lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics", // <-- Tambahkan/Sesuaikan ini!
+            "classPaths": [ // <-- Tambahkan ini!
+                "${workspaceFolder}/bin",   // Asumsikan 'compile.bat' menaruh .class di 'bin'
+                "${workspaceFolder}/bin/img" // Asumsikan 'compile.bat' menyalin 'img' ke dalam 'bin'
+            ]
+        }
+    ]
+}

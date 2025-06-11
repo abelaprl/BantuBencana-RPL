@@ -1,0 +1,9 @@
+{
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar", // Jika ada folder 'lib', biarkan ini
+        "img"           // Ini yang akan memasukkan folder 'img' ke classpath
+    ]
+}
