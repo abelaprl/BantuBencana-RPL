@@ -3,65 +3,106 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<BorderPane prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LaporanListController">
+<BorderPane prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #e3f2fd;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LaporanListController">
     <center>
-        <VBox alignment="TOP_CENTER" spacing="0.0">
+        <VBox alignment="TOP_CENTER">
             <padding>
-                <Insets top="20.0" bottom="20.0" left="40.0" right="40.0" />
+                <Insets top="30.0" bottom="30.0" left="40.0" right="40.0" />
             </padding>
-            
-            <!-- Main Content Card -->
-            <VBox style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" maxWidth="900.0">
+
+            <VBox spacing="20.0" maxWidth="900.0"
+                  style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 4);">
                 <padding>
-                    <Insets top="20.0" bottom="20.0" left="20.0" right="20.0" />
+                    <Insets top="24.0" bottom="24.0" left="24.0" right="24.0" />
                 </padding>
-                
-                <!-- Tab Pane -->
-                <TabPane fx:id="tabPane" style="-fx-background-color: transparent;">
+
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Text text="🚨 Daftar Laporan Bencana"
+                           style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2196F3; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 1, 1);" />
+                    <Region HBox.hgrow="ALWAYS" />
+                </HBox>
+
+                <TabPane fx:id="tabPane" tabMinWidth="120" tabMaxWidth="180"
+                         style="-fx-background-color: transparent; /* Untuk TabPane utama */
+                                -fx-tab-min-width: 120px;
+                                -fx-tab-max-width: 180px;
+
+                                /* Styling untuk Tab Header Area */
+                                -fx-tab-header-area-background-color: transparent; /* Latar belakang area di sekitar header tab */
+                                -fx-tab-header-background: #F0F0F0; /* Latar belakang di belakang tab */
+                                -fx-padding: 0; /* Padding untuk area header */
+
+                                /* Styling untuk setiap Tab individual */
+                                -fx-tab-base-color: #E0E0E0; /* Warna dasar tab saat tidak dipilih */
+                                -fx-tab-background-color: #F5F5F5; /* Warna latar belakang tab yang tidak dipilih */
+                                -fx-background-radius: 8px 8px 0 0; /* Sudut melengkung untuk tab */
+                                -fx-padding: 10px 15px; /* Padding dalam tab */
+                                -fx-tab-label-padding: 0 5px; /* Padding untuk label teks di tab */
+                                -fx-border-color: #B0BEC5; /* Warna border tab */
+                                -fx-border-width: 1px 1px 0 1px; /* Lebar border (atas, kanan, bawah, kiri) */
+                                -fx-border-insets: 0 0 0 0; /* Insets untuk border tab */
+                                -fx-cursor: hand; /* Kursor berubah jadi tangan saat di atas tab */
+
+                                /* Styling saat Tab di-hover */
+                                -fx-tab-hover-background-color: #E8E8E8;
+
+                                /* Styling saat Tab terpilih */
+                                -fx-tab-selected-background-color: white; /* Warna latar belakang tab saat dipilih */
+                                -fx-tab-selected-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 0); /* Efek bayangan saat terpilih */
+                                -fx-tab-selected-border-color: #B0BEC5; /* Border saat tab dipilih */
+                                -fx-tab-selected-border-width: 1px 1px 0 1px; /* Lebar border saat tab dipilih */
+
+                                /* Styling untuk Teks Label di dalam Tab */
+                                -fx-tab-label-text-fill: #555555; /* Warna teks tab yang tidak dipilih */
+                                -fx-tab-selected-label-text-fill: #3F51B5; /* Warna teks tab yang dipilih */
+                                -fx-tab-selected-label-font-weight: bold; /* Teks tab yang dipilih menjadi bold */
+
+                                /* Lain-lain */
+                                -fx-selection-bar-enabled: false; /* Sembunyikan bar seleksi default */
+                                -fx-focus-color: transparent; /* Hilangkan focus border */
+                                -fx-faint-focus-color: transparent; /* Hilangkan faint focus border */
+                                "
+                         >
                     
-                    <!-- Publik Tab -->
                     <Tab fx:id="publikTab" text="Publik" closable="false">
-                        <VBox spacing="15.0">
+                        <VBox spacing="12.0">
                             <padding>
-                                <Insets top="10.0" bottom="10.0" left="10.0" right="10.0" />
+                                <Insets top="10.0" bottom="10.0" left="5.0" right="5.0" />
                             </padding>
-                            
-                            <TableView fx:id="publikTable" style="-fx-background-color: transparent; -fx-table-cell-border-color: #e9ecef;">
+
+                            <TableView fx:id="publikTable"
+                                       style="-fx-background-color: white; -fx-border-color: #bbdefb; -fx-border-width: 1px; -fx-border-radius: 8; -fx-table-cell-border-color: transparent;">
                                 <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                 </columnResizePolicy>
                             </TableView>
-                            
                         </VBox>
                     </Tab>
-                    
-                    <!-- Oleh Anda Tab -->
+
                     <Tab fx:id="olehAndaTab" text="Oleh Anda" closable="false">
-                        <VBox spacing="15.0">
+                        <VBox spacing="12.0">
                             <padding>
-                                <Insets top="10.0" bottom="10.0" left="10.0" right="10.0" />
+                                <Insets top="10.0" bottom="10.0" left="5.0" right="5.0" />
                             </padding>
-                            
-                            <TableView fx:id="olehAndaTable" style="-fx-background-color: transparent; -fx-table-cell-border-color: #e9ecef;">
+
+                            <TableView fx:id="olehAndaTable"
+                                       style="-fx-background-color: white; -fx-border-color: #bbdefb; -fx-border-width: 1px; -fx-border-radius: 8; -fx-table-cell-border-color: transparent;">
                                 <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                 </columnResizePolicy>
                             </TableView>
-                            
-                            <!-- Buat Laporan Button -->
+
                             <HBox alignment="CENTER_RIGHT">
-                                <Button fx:id="buatLaporanButton" onAction="#handleBuatLaporan" 
-                                       text="Buat Laporan Baru" 
-                                       style="-fx-background-color: #ff6b6b; -fx-text-fill: white; -fx-background-radius: 20; -fx-font-size: 14px; -fx-padding: 10 20; -fx-font-weight: bold;" />
+                                <Button fx:id="buatLaporanButtonBottom" onAction="#handleBuatLaporan"
+                                        text="Buat Laporan Baru"
+                                        style="-fx-background-color: #ff6b81; -fx-text-fill: white; -fx-background-radius: 24; -fx-font-size: 14px; -fx-padding: 10 22; -fx-font-weight: bold; -fx-cursor: hand;" />
                             </HBox>
-                            
                         </VBox>
                     </Tab>
-                    
+
                 </TabPane>
-                
             </VBox>
         </VBox>
     </center>
