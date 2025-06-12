@@ -30,22 +30,24 @@
 
 
 ## 📁 Struktur Folder Proyek
-
+```
 BantuBencana-RPL/
-├── src/                      # Kode sumber aplikasi Java
-│   └── com/                 # Package utama
-│       ├── Main.java  
-│       ├── *.java          # Seluruh file source Java
-│       └── *.fxml          # File antarmuka JavaFX
-├── tests/                   # Unit test JUnit
-│   └── *.java
-├── lib/                     # Library eksternal
-│   └── junit-platform-console-standalone-1.13.0-M3.jar
-├── bin/                     # Output hasil kompilasi
-├── img/                     # Gambar tampilan aplikasi, untuk dokumentasi
-├── doc/                     # Dokumen laporan proyek lengkap dengan screen capture
-├── compile.bat              # Skrip kompilasi dan eksekusi aplikasi
-└── README.md                # Dokumentasi utama proyek
+├── src/         # Kode sumber aplikasi Java
+│ └── com/       # Package utama
+│ ├── Main.java
+│ ├── *.java     # Seluruh file source Java
+│ └── *.fxml     # File antarmuka JavaFX
+├── tests/       # Unit test JUnit
+│ └── *.java
+├── lib/         # Library eksternal
+│ └── junit-platform-console-standalone-1.13.0-M3.jar
+├── bin/         # Output hasil kompilasi
+├── img/         # Gambar tampilan aplikasi, untuk dokumentasi
+├── doc/         # Dokumen laporan proyek lengkap dengan screen capture
+├── compile.bat  # Skrip kompilasi dan eksekusi aplikasi
+└── README.md    # Dokumentasi utama proyek
+```
+
 ## 📦 Daftar Modul yang Diimplementasi
 
 | No | Nama Modul                  | Nama File Fisik                                                                                                                                       | Nama File Eksekusi |
