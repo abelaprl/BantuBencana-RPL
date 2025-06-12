@@ -93,30 +93,6 @@
                   </Button>
                </children>
             </HBox>
-
-            <!-- Demo Credentials -->
-            <VBox alignment="CENTER" spacing="5.0">
-               <VBox.margin>
-                  <Insets top="15.0" />
-               </VBox.margin>
-               <children>
-                  <Label text="Demo Credentials:" textFill="#7f8c8d">
-                     <font>
-                        <Font name="System Bold" size="11.0" />
-                     </font>
-                  </Label>
-                  <Label text="Admin: admin@example.com / admin123" textFill="#95a5a6">
-                     <font>
-                        <Font size="10.0" />
-                     </font>
-                  </Label>
-                  <Label text="User: user@example.com / user123" textFill="#95a5a6">
-                     <font>
-                        <Font size="10.0" />
-                     </font>
-                  </Label>
-               </children>
-            </VBox>
          </children>
       </VBox>
    </children>
