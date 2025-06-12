@@ -28,7 +28,7 @@ echo.
 REM --- CHANGE THIS LINE ---
 REM Compile all .java files in the 'src' directory, adding javafx.media module
 
-javac --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -cp "%JUNIT_JAR%" -d bin src\*.java
+javac --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -cp "%JUNIT_JAR%" -d bin src\*.java tests\*.java
 
 if errorlevel 1 (
     echo ❌ Compile error.

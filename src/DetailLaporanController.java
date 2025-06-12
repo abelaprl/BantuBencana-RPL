@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import data.LaporanBencanaData;
+
 public class DetailLaporanController implements Initializable {
 
     @FXML private Label idLaporanLabel;

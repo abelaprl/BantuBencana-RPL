@@ -18,6 +18,18 @@ public class DashboardTest {
     }
 
     @Test
+    public void testAddSingleLaporanBencana() {
+        LaporanBencanaData laporan = new LaporanBencanaData("Banjir", "Jakarta", "Banjir parah", "Parah", "3");
+        Dashboard.addLaporanBencana(laporan);
+
+        List<LaporanBencanaData> semuaLaporan = Dashboard.getAllLaporanBencana();
+        assertEquals(1, semuaLaporan.size());
+        assertEquals("Banjir", semuaLaporan.get(0).getJenis());
+        assertEquals("Jakarta", semuaLaporan.get(0).getLokasi());
+}
+
+
+    @Test
     public void testRemoveLaporanBencanaFromDatabase() {
         LaporanBencanaData laporan = new LaporanBencanaData("Gempa", "Padang", "Gempa ringan", "Ringan", "0");
         Dashboard.addLaporanBencana(laporan);

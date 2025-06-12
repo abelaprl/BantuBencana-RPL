@@ -1,3 +1,4 @@
+package data;
 // File: src/LaporanBencanaData.java
 
 import java.io.Serializable;
