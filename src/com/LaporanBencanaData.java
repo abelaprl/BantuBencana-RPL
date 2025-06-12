@@ -70,6 +70,10 @@ public class LaporanBencanaData implements Serializable {
         return jenisBencana + " - " + lokasi + " (" + tingkatKeparahan + ")";
     }
 
+    public String getJenis() {
+        return getJenisBencana();
+    }
+
     @Override
     public String toString() {
         return "LaporanBencanaData{" +

@@ -30,7 +30,9 @@ javac -version
 echo.
 
 REM Compile all .java files
-javac --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -cp "%JUNIT_JAR%" -d bin src\com\*.java 
+javac --module-path "%JAVAFX_LIB%" ^
+--add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media ^
+-cp "%JUNIT_JAR%;src" -d bin src\com\*.java tests\*.java
 
 if errorlevel 1 (
     echo ❌ Compile error.
@@ -40,14 +42,14 @@ if errorlevel 1 (
 
 echo ✅ Compilation successful.
 
-@REM echo [2] Run Tests...
-@REM java --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -cp "%JUNIT_JAR%;bin" org.junit.platform.console.ConsoleLauncher --scan-class-path
+echo [2] Run Tests...
+java --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -cp "%JUNIT_JAR%;bin" org.junit.platform.console.ConsoleLauncher --scan-class-path
 
-@REM if errorlevel 1 (
-@REM     echo ❌ Test run error.
-@REM     pause
-@REM     exit /b
-@REM )
+if errorlevel 1 (
+    echo ❌ Test run error.
+    pause
+    exit /b
+)
 
 echo ✅ Tests completed.
 
