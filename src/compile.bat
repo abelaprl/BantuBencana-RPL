@@ -2,7 +2,8 @@
 setlocal
 
 REM Path ke folder lib JavaFX kamu
-set JAVAFX_LIB=C:\Users\User\Downloads\openjfx-24.0.1_windows-x64_bin-sdk\javafx-sdk-24.0.1\lib
+set JAVAFX_LIB=C:\JavaFX\javafx-sdk-24.0.1\lib
+set JUNIT_JAR="lib\junit-platform-console-standalone-1.13.0-M3.jar"
 
 echo.
 echo --- JavaFX Compilation and Run Script ---
@@ -26,7 +27,9 @@ echo.
 
 REM --- CHANGE THIS LINE ---
 REM Compile all .java files in the 'src' directory, adding javafx.media module
-javac --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media src\*.java
+
+javac --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -cp "%JUNIT_JAR%" -d bin src\*.java
+
 if errorlevel 1 (
     echo ❌ Compile error.
     pause
@@ -35,8 +38,21 @@ if errorlevel 1 (
 
 echo ✅ Compilation successful.
 
+echo [2] Run Tests...
+REM 🛠️ Perbaikan: Menjalankan ConsoleLauncher secara eksplisit agar JavaFX dikenali
+java --module-path "%JAVAFX_LIB%" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media -cp "%JUNIT_JAR%;bin" org.junit.platform.console.ConsoleLauncher --scan-class-path
+
+if errorlevel 1 (
+    echo ❌ Test run error.
+    pause
+    exit /b
+)
+
+echo ✅ Tests completed.
+
+
 echo.
-echo [2] Running application...
+echo [3] Running application...
 echo Verifying Java version used for execution...
 where java
 java -version
@@ -52,6 +68,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo ✅ Application exited.
+echo ✅ Application exited.S
 pause
 endlocal

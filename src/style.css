@@ -110,9 +110,9 @@
 /* --- MODERN PASTEL BLUE DASHBOARD STYLES --- */
 
 /* Global Dashboard Background - Soft Blue Gradient */
-.dashboard-root-pane {
+/* .dashboard-root-pane {
     -fx-background-color: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 25%, #ddeeff 50%, #d4e9ff 75%, #cce4ff 100%);
-}
+} */
 
 /* --- Modern Sidebar with Pastel Blue Theme --- */
 .sidebar {
@@ -232,11 +232,11 @@
 
 /* --- Modern Main Content Area --- */
 .main-content-pane {
-    -fx-background-color: linear-gradient(135deg, 
+    /* -fx-background-color: linear-gradient(135deg, 
         rgba(255, 255, 255, 0.9) 0%, 
         rgba(248, 251, 255, 0.9) 25%, 
         rgba(240, 248, 255, 0.85) 50%, 
-        rgba(230, 243, 255, 0.8) 100%); /* Beautiful blue-tinted gradient */
+        rgba(230, 243, 255, 0.8) 100%); Beautiful blue-tinted gradient */
     -fx-background-radius: 25px 0 0 0; /* Larger rounded corner */
     -fx-padding: 35px;
     -fx-spacing: 30px;
@@ -311,11 +311,11 @@
 
 /* Modern Card Container for Content - Enhanced */
 .bencana-list-container {
-    -fx-background-color: linear-gradient(145deg, 
+    /* -fx-background-color: linear-gradient(145deg, 
         rgba(255, 255, 255, 0.95) 0%, 
         rgba(248, 251, 255, 0.9) 30%, 
         rgba(240, 248, 255, 0.85) 70%, 
-        rgba(235, 245, 255, 0.9) 100%); /* Rich gradient background */
+        rgba(235, 245, 255, 0.9) 100%); Rich gradient background */
     -fx-padding: 30px;
     -fx-spacing: 25px;
     -fx-background-radius: 20px;
@@ -341,9 +341,9 @@
 }
 
 .info-card {
-    -fx-background-color: linear-gradient(135deg, 
+    /* -fx-background-color: linear-gradient(135deg, 
         rgba(255, 255, 255, 0.9) 0%, 
-        rgba(248, 250, 255, 0.85) 100%);
+        rgba(248, 250, 255, 0.85) 100%); */
     -fx-padding: 20px;
     -fx-spacing: 15px;
     -fx-background-radius: 12px;
@@ -354,9 +354,9 @@
 }
 
 .info-card:hover {
-    -fx-background-color: linear-gradient(135deg, 
+    /* -fx-background-color: linear-gradient(135deg, 
         rgba(255, 255, 255, 0.95) 0%, 
-        rgba(240, 248, 255, 0.9) 100%);
+        rgba(240, 248, 255, 0.9) 100%); */
     -fx-effect: dropshadow(gaussian, rgba(59, 130, 246, 0.2), 20, 0, 0, 12);
     -fx-scale-x: 1.02;
     -fx-scale-y: 1.02;
@@ -406,9 +406,9 @@
 
 /* Decorative elements for empty states */
 .empty-state {
-    -fx-background-color: linear-gradient(135deg, 
+    /* -fx-background-color: linear-gradient(135deg, 
         rgba(243, 244, 246, 0.5), 
-        rgba(249, 250, 251, 0.3));
+        rgba(249, 250, 251, 0.3)); */
     -fx-padding: 40px;
     -fx-spacing: 20px;
     -fx-background-radius: 15px;
@@ -428,10 +428,10 @@
 
 /* Loading animation placeholder */
 .loading-shimmer {
-    -fx-background-color: linear-gradient(90deg, 
+    /* -fx-background-color: linear-gradient(90deg, 
         rgba(243, 244, 246, 0.5) 0%, 
         rgba(255, 255, 255, 0.8) 50%, 
-        rgba(243, 244, 246, 0.5) 100%);
+        rgba(243, 244, 246, 0.5) 100%); */
     -fx-background-radius: 8px;
     -fx-pref-height: 20px;
 }

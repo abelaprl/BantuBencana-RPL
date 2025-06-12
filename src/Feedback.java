@@ -356,7 +356,7 @@ public class Feedback extends Application {
         scrollPane.setStyle("-fx-background-color: transparent; " +
                            "-fx-background: transparent;");
 
-        Scene scene = new Scene(scrollPane, 750, 900);
+        Scene scene = new Scene(scrollPane, 750, 800);
         primaryStage.setTitle("Form Feedback Pasca Bencana");
         primaryStage.setScene(scene);
         primaryStage.show();
