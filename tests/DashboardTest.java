@@ -2,8 +2,8 @@ package tests;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import Dashboard;
-import LaporanBencanaData;
+import com.Dashboard;
+import com.LaporanBencanaData;
 
 import static org.junit.jupiter.api.Assertions.*;
 
