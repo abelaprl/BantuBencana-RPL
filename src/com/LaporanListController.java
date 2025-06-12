@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -31,6 +33,14 @@ public class LaporanListController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupTables();
+        
+        // Get current user email from session
+        if (UserSessionManager.isLoggedIn()) {
+            currentUserEmail = UserSessionManager.getCurrentUserEmail();
+        } else {
+            currentUserEmail = "anonymous";
+        }
+        
         loadData();
     }
 
@@ -48,71 +58,34 @@ public class LaporanListController implements Initializable {
         // Jenis Bencana Column
         TableColumn<LaporanBencanaDisplay, String> jenisCol = new TableColumn<>("Jenis Bencana");
         jenisCol.setCellValueFactory(new PropertyValueFactory<>("jenisBencana"));
-        jenisCol.setPrefWidth(150);
+        jenisCol.setPrefWidth(200);
 
         // Lokasi Column
         TableColumn<LaporanBencanaDisplay, String> lokasiCol = new TableColumn<>("Lokasi");
         lokasiCol.setCellValueFactory(new PropertyValueFactory<>("lokasi"));
-        lokasiCol.setPrefWidth(180);
-
-        // Status Column
-        TableColumn<LaporanBencanaDisplay, String> statusCol = new TableColumn<>("Status");
-        statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
-        statusCol.setPrefWidth(120);
-        statusCol.setCellFactory(column -> new TableCell<LaporanBencanaDisplay, String>() {
-            @Override
-            protected void updateItem(String status, boolean empty) {
-                super.updateItem(status, empty);
-                if (empty || status == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(status);
-                    switch (status.toLowerCase()) {
-                        case "diverifikasi":
-                            setStyle("-fx-text-fill: #28a745; -fx-font-weight: bold;");
-                            break;
-                        case "diproses":
-                            setStyle("-fx-text-fill: #ffc107; -fx-font-weight: bold;");
-                            break;
-                        case "ditolak":
-                            setStyle("-fx-text-fill: #dc3545; -fx-font-weight: bold;");
-                            break;
-                        default:
-                            setStyle("-fx-text-fill: #6c757d;");
-                    }
-                }
-            }
-        });
+        lokasiCol.setPrefWidth(200);
 
         // Waktu Column
         TableColumn<LaporanBencanaDisplay, String> waktuCol = new TableColumn<>("Waktu");
         waktuCol.setCellValueFactory(new PropertyValueFactory<>("waktu"));
-        waktuCol.setPrefWidth(120);
+        waktuCol.setPrefWidth(150);
 
-        // Action Column
+        // Action Column - hanya tombol Lihat Detail
         TableColumn<LaporanBencanaDisplay, Void> actionCol = new TableColumn<>("Aksi");
-        actionCol.setPrefWidth(200);
+        actionCol.setPrefWidth(150);
         actionCol.setCellFactory(column -> new TableCell<LaporanBencanaDisplay, Void>() {
             private final Button lihatDetailBtn = new Button("Lihat Detail");
-            private final Button donasiBtn = new Button("Donasi");
             private final HBox actionBox = new HBox(8);
 
             {
                 lihatDetailBtn.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-background-radius: 15; -fx-font-size: 11px; -fx-padding: 5 12;");
-                donasiBtn.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-background-radius: 15; -fx-font-size: 11px; -fx-padding: 5 12;");
                 
                 actionBox.setAlignment(Pos.CENTER);
-                actionBox.getChildren().addAll(lihatDetailBtn, donasiBtn);
+                actionBox.getChildren().add(lihatDetailBtn);
 
                 lihatDetailBtn.setOnAction(event -> {
                     LaporanBencanaDisplay laporan = getTableView().getItems().get(getIndex());
                     handleLihatDetail(laporan);
-                });
-
-                donasiBtn.setOnAction(event -> {
-                    LaporanBencanaDisplay laporan = getTableView().getItems().get(getIndex());
-                    handleDonasi(laporan);
                 });
             }
 
@@ -122,22 +95,12 @@ public class LaporanListController implements Initializable {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    LaporanBencanaDisplay laporan = getTableView().getItems().get(getIndex());
-                    
-                    // Show different buttons based on status and tab
-                    actionBox.getChildren().clear();
-                    actionBox.getChildren().add(lihatDetailBtn);
-                    
-                    if (laporan.getStatus().equals("Diverifikasi")) {
-                        actionBox.getChildren().add(donasiBtn);
-                    }
-                    
                     setGraphic(actionBox);
                 }
             }
         });
 
-        table.getColumns().addAll(jenisCol, lokasiCol, statusCol, waktuCol, actionCol);
+        table.getColumns().addAll(jenisCol, lokasiCol, waktuCol, actionCol);
         table.setRowFactory(tv -> {
             TableRow<LaporanBencanaDisplay> row = new TableRow<>();
             row.setStyle("-fx-background-color: white; -fx-border-color: #e9ecef; -fx-border-width: 0 0 1 0;");
@@ -150,36 +113,34 @@ public class LaporanListController implements Initializable {
         ObservableList<LaporanBencanaDisplay> publikData = FXCollections.observableArrayList();
         ObservableList<LaporanBencanaDisplay> olehAndaData = FXCollections.observableArrayList();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        String currentTime = LocalDateTime.now().format(formatter);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-        for (int i = 0; i < allLaporan.size(); i++) {
-            LaporanBencanaData laporan = allLaporan.get(i);
-            String status = getRandomStatus(i);
+        for (LaporanBencanaData laporan : allLaporan) {
+            // Format timestamp to readable date
+            String formattedDate = formatter.format(new Date(laporan.getTimestamp()));
             
             LaporanBencanaDisplay display = new LaporanBencanaDisplay(
                 laporan.getJenisBencana(),
                 laporan.getLokasi(),
-                status,
-                currentTime,
+                formattedDate,
                 laporan
             );
             
+            // Add to public tab
             publikData.add(display);
             
-            // Add some items to "Oleh Anda" tab (simulate user's reports)
-            if (i < 3) {
+            // Add to "Oleh Anda" tab only if created by current user
+            if (laporan.getCreatedBy().equals(currentUserEmail)) {
                 olehAndaData.add(display);
             }
         }
 
         publikTable.setItems(publikData);
         olehAndaTable.setItems(olehAndaData);
-    }
-
-    private String getRandomStatus(int index) {
-        String[] statuses = {"Diverifikasi", "Diproses", "Ditolak"};
-        return statuses[index % statuses.length];
+        
+        // Update tab titles with count
+        publikTab.setText("Semua Laporan (" + publikData.size() + ")");
+        olehAndaTab.setText("Oleh Anda (" + olehAndaData.size() + ")");
     }
 
     private void handleLihatDetail(LaporanBencanaDisplay laporan) {
@@ -188,14 +149,6 @@ public class LaporanListController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void handleDonasi(LaporanBencanaDisplay laporan) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Donasi");
-        alert.setHeaderText(null);
-        alert.setContentText("Fitur donasi untuk " + laporan.getJenisBencana() + " di " + laporan.getLokasi() + " akan segera tersedia.");
-        alert.showAndWait();
     }
 
     @FXML
@@ -207,26 +160,23 @@ public class LaporanListController implements Initializable {
         }
     }
 
-    // Inner class for table display
+    // Inner class for table display - status field removed
     public static class LaporanBencanaDisplay {
         private String jenisBencana;
         private String lokasi;
-        private String status;
         private String waktu;
         private LaporanBencanaData originalData;
 
-        public LaporanBencanaDisplay(String jenisBencana, String lokasi, String status, String waktu, LaporanBencanaData originalData) {
+        public LaporanBencanaDisplay(String jenisBencana, String lokasi, String waktu, LaporanBencanaData originalData) {
             this.jenisBencana = jenisBencana;
             this.lokasi = lokasi;
-            this.status = status;
             this.waktu = waktu;
             this.originalData = originalData;
         }
 
-        // Getters
+        // Getters - status getter removed
         public String getJenisBencana() { return jenisBencana; }
         public String getLokasi() { return lokasi; }
-        public String getStatus() { return status; }
         public String getWaktu() { return waktu; }
         public LaporanBencanaData getOriginalData() { return originalData; }
     }

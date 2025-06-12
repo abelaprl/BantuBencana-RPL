@@ -1,106 +1,108 @@
 package com;
-// src/UserController.java
+
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.event.ActionEvent;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class UserController {
+public class UserController implements Initializable {
 
-    // Fields untuk Login
-    @FXML private TextField loginEmailField;
-    @FXML private PasswordField loginPasswordField;
-    @FXML private Label loginMessageLabel;
-
-    // Fields untuk Register
-    @FXML private TextField registerEmailField;
-    @FXML private PasswordField registerPasswordField;
-    @FXML private PasswordField registerConfirmPasswordField;
-    @FXML private Label registerMessageLabel;
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private PasswordField confirmPasswordField;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private Button backToLoginButton;
 
     private UserRepository userRepository = new UserRepository();
 
-    // --- Metode untuk Login ---
-    @FXML
-    private void handleLogin(ActionEvent event) {
-        String email = loginEmailField.getText();
-        String password = loginPasswordField.getText();
-
-        if (email.isEmpty() || password.isEmpty()) {
-            loginMessageLabel.setText("Email dan password tidak boleh kosong.");
-            return;
-        }
-
-        User user = userRepository.authenticateByEmail(email, password);
-
-        if (user != null) {
-            loginMessageLabel.setText("Login berhasil!");
-            loginMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
-            System.out.println("Logged in as: " + user.getEmail());
-            try {
-                Main.showDashboardView();
-            } catch (IOException e) {
-                e.printStackTrace();
-                loginMessageLabel.setText("Error loading dashboard.");
-            }
-        } else {
-            loginMessageLabel.setText("Email atau password salah.");
-        }
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        System.out.println("DEBUG: UserController initialized");
     }
 
-    @FXML
-    private void handleRegisterRedirect(ActionEvent event) {
-        try {
-            Main.showRegisterView();
-        } catch (IOException e) {
-            e.printStackTrace();
-            loginMessageLabel.setText("Error memuat halaman pendaftaran.");
-        }
-    }
-
-    // --- Metode untuk Register ---
     @FXML
     private void handleRegister(ActionEvent event) {
-        String email = registerEmailField.getText();
-        String password = registerPasswordField.getText();
-        String confirmPassword = registerConfirmPasswordField.getText();
+        String name = nameField != null ? nameField.getText().trim() : "";
+        String email = emailField != null ? emailField.getText().trim() : "";
+        String password = passwordField != null ? passwordField.getText() : "";
+        String confirmPassword = confirmPasswordField != null ? confirmPasswordField.getText() : "";
 
-        if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            registerMessageLabel.setText("Semua kolom harus diisi.");
+        System.out.println("DEBUG: Registration attempt for email: " + email);
+
+        // Validation
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Semua field harus diisi!");
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            registerMessageLabel.setText("Password tidak cocok.");
+            showAlert(Alert.AlertType.ERROR, "Error", "Password dan konfirmasi password tidak sama!");
             return;
         }
 
-        if (userRepository.isEmailTaken(email)) {
-            registerMessageLabel.setText("Email sudah terdaftar.");
+        if (password.length() < 6) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Password minimal 6 karakter!");
             return;
         }
 
-        User newUser = new User(email, password, email); // username, password, email
-        userRepository.register(newUser);
-        registerMessageLabel.setText("Pendaftaran berhasil! Silakan login.");
-        registerMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
-
-        // Bersihkan kolom
-        registerEmailField.clear();
-        registerPasswordField.clear();
-        registerConfirmPasswordField.clear();
-    }
-
-    @FXML
-    private void handleLoginRedirect(ActionEvent event) {
         try {
+            if (userRepository.isEmailExists(email)) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Email sudah terdaftar!");
+                return;
+            }
+
+            User newUser = new User(name, email, password);
+            userRepository.save(newUser);
+            
+            System.out.println("DEBUG: Registration successful for: " + email);
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Registrasi berhasil! Silakan login.");
+            
+            // Navigate back to login
             Main.showLoginView();
         } catch (IOException e) {
             e.printStackTrace();
-            registerMessageLabel.setText("Error memuat halaman login.");
+            System.err.println("ERROR: Failed to navigate to login view");
+            showAlert(Alert.AlertType.ERROR, "Error", "Terjadi kesalahan sistem!");
         }
+    }
+
+    @FXML
+    private void handleBackToLogin(ActionEvent event) {
+        try {
+            System.out.println("DEBUG: Navigating back to login view");
+            Main.showLoginView();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("ERROR: Failed to navigate to login view");
+            showAlert(Alert.AlertType.ERROR, "Error", "Tidak dapat kembali ke halaman login!");
+        }
+    }
+
+    // Method for authentication (used by LoginController)
+    public boolean authenticateUser(String email, String password) {
+        System.out.println("DEBUG: Authenticating user: " + email);
+        return userRepository.authenticate(email, password);
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

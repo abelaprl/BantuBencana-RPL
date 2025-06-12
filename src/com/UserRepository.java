@@ -1,69 +1,127 @@
 package com;
-// File: src/UserRepository.java
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserRepository {
-    private static List<User> userList;
-
+    private static final String USER_DATA_FILE = "user_data.txt";
+    private static List<User> users = new ArrayList<>();
+    
+    // Load users from file when class is first loaded
     static {
-        userList = DataManager.loadUserData(); // Muat data user dari file
-    }
-
-    public void register(User user) {
-        // Periksa apakah username atau email sudah terdaftar
-        if (isUsernameTaken(user.getUsername())) {
-            System.out.println("Registrasi gagal: Username '" + user.getUsername() + "' sudah ada.");
-        } else if (isEmailTaken(user.getEmail())) { // <-- Tambahkan pengecekan email
-            System.out.println("Registrasi gagal: Email '" + user.getEmail() + "' sudah ada.");
-        }
-        else {
-            userList.add(user);
-            DataManager.saveUserData(userList); // Simpan data setelah registrasi
-            System.out.println("User " + user.getUsername() + " berhasil didaftarkan.");
+        loadUsersFromFile();
+        
+        // Add default users if file is empty or doesn't exist
+        if (users.isEmpty()) {
+            users.add(new User("Admin", "admin@example.com", "admin123"));
+            users.add(new User("User Test", "user@example.com", "user123"));
+            saveUsersToFile(); // Save default users to file
+            System.out.println("DEBUG: Default users created and saved to file");
         }
     }
 
-    // Metode autentikasi berdasarkan username (tetap ada jika suatu saat ingin pakai username)
-    public User authenticate(String username, String password) {
-        for (User user : userList) {
-            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                return user; // Autentikasi berhasil
+    public void save(User user) {
+        users.add(user);
+        saveUsersToFile();
+        System.out.println("DEBUG: User saved: " + user.getEmail());
+    }
+
+    public boolean isEmailExists(String email) {
+        boolean exists = users.stream().anyMatch(user -> user.getEmail().equals(email));
+        System.out.println("DEBUG: Email exists check for " + email + ": " + exists);
+        return exists;
+    }
+
+    public boolean authenticate(String email, String password) {
+        boolean authenticated = users.stream()
+            .anyMatch(user -> user.getEmail().equals(email) && user.getPassword().equals(password));
+        System.out.println("DEBUG: Authentication for " + email + ": " + authenticated);
+        return authenticated;
+    }
+
+    public User findByEmail(String email) {
+        return users.stream()
+            .filter(user -> user.getEmail().equals(email))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public List<User> findAll() {
+        return new ArrayList<>(users);
+    }
+
+    // Save users to file
+    private static void saveUsersToFile() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(USER_DATA_FILE))) {
+            for (User user : users) {
+                // Format: name|email|password
+                writer.println(user.getName() + "|" + user.getEmail() + "|" + user.getPassword());
             }
+            System.out.println("DEBUG: User data berhasil disimpan ke file: " + USER_DATA_FILE);
+        } catch (IOException e) {
+            System.err.println("ERROR: Gagal menyimpan data user ke file: " + e.getMessage());
+            e.printStackTrace();
         }
-        return null; // Autentikasi gagal
     }
 
-    // <-- Tambahkan metode autentikasi berdasarkan Email -->
-    public User authenticateByEmail(String email, String password) {
-        for (User user : userList) {
-            if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                return user; // Autentikasi berhasil
-            }
+    // Load users from file
+    private static void loadUsersFromFile() {
+        File file = new File(USER_DATA_FILE);
+        if (!file.exists()) {
+            System.out.println("DEBUG: File user data tidak ditemukan, akan dibuat baru");
+            return;
         }
-        return null; // Autentikasi gagal
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            users.clear(); // Clear existing users before loading
+            
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                if (parts.length == 3) {
+                    String name = parts[0];
+                    String email = parts[1];
+                    String password = parts[2];
+                    users.add(new User(name, email, password));
+                }
+            }
+            System.out.println("DEBUG: " + users.size() + " user berhasil dimuat dari file: " + USER_DATA_FILE);
+        } catch (IOException e) {
+            System.err.println("ERROR: Gagal memuat data user dari file: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    public boolean isUsernameTaken(String username) {
-        for (User user : userList) {
-            if (user.getUsername().equals(username)) {
-                return true;
-            }
+    // Method to reload users from file (useful for testing)
+    public static void reloadUsers() {
+        loadUsersFromFile();
+    }
+
+    // Method to get total user count
+    public static int getUserCount() {
+        return users.size();
+    }
+
+    // Method to delete user (for admin purposes)
+    public boolean deleteUser(String email) {
+        boolean removed = users.removeIf(user -> user.getEmail().equals(email));
+        if (removed) {
+            saveUsersToFile();
+            System.out.println("DEBUG: User deleted: " + email);
+        }
+        return removed;
+    }
+
+    // Method to update user password
+    public boolean updateUserPassword(String email, String newPassword) {
+        User user = findByEmail(email);
+        if (user != null) {
+            user.setPassword(newPassword);
+            saveUsersToFile();
+            System.out.println("DEBUG: Password updated for user: " + email);
+            return true;
         }
         return false;
-    }
-
-    // <-- Tambahkan metode untuk memeriksa apakah email sudah terdaftar -->
-    public boolean isEmailTaken(String email) {
-        for (User user : userList) {
-            if (user.getEmail().equals(email)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public List<User> getAllUsers() {
-        return new ArrayList<>(userList);
     }
 }

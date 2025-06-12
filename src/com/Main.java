@@ -1,4 +1,5 @@
 package com;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -6,99 +7,174 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class Main extends Application {
-
-    private static Stage primaryStageStatic; // Untuk menyimpan primary stage
+    
+    private static Stage primaryStage;
 
     @Override
-    public void start(Stage primaryStage) {
-        primaryStageStatic = primaryStage; // Simpan primary stage
-        primaryStage.setTitle("Bantu Bencana App");
-
-        // Panggil metode untuk menampilkan tampilan login terlebih dahulu
-        try {
-            showLoginView();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void start(Stage stage) throws Exception {
+        primaryStage = stage;
+        showLoginView();
     }
 
     public static void showLoginView() throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/com/LoginView.fxml"));
+        System.out.println("DEBUG: Loading LoginView...");
+        URL fxmlLocation = Main.class.getResource("/com/LoginView.fxml");
+        if (fxmlLocation == null) {
+            System.err.println("ERROR: LoginView.fxml not found! Trying alternative path...");
+            fxmlLocation = Main.class.getResource("LoginView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("ERROR: LoginView.fxml not found in any location!");
+                return;
+            }
+        }
+        
+        System.out.println("DEBUG: Found LoginView.fxml at: " + fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Parent root = loader.load();
-        LoginController loginController = loader.getController();
-        loginController.setPrimaryStage(primaryStageStatic); // Set stage untuk LoginController
-
-        primaryStageStatic.setScene(new Scene(root, 400, 300));
-        primaryStageStatic.show();
+        
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Login - Disaster Management System");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public static void showRegisterView() throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/com/RegisterView.fxml"));
+        System.out.println("DEBUG: Loading RegisterView...");
+        URL fxmlLocation = Main.class.getResource("/com/RegisterView.fxml");
+        if (fxmlLocation == null) {
+            System.err.println("ERROR: RegisterView.fxml not found! Trying alternative path...");
+            fxmlLocation = Main.class.getResource("RegisterView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("ERROR: RegisterView.fxml not found in any location!");
+                return;
+            }
+        }
+        
+        System.out.println("DEBUG: Found RegisterView.fxml at: " + fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Parent root = loader.load();
-        RegisterController registerController = loader.getController();
-        registerController.setPrimaryStage(primaryStageStatic); // Set stage untuk RegisterController
-
-        primaryStageStatic.setScene(new Scene(root, 400, 500)); // Sesuaikan ukuran window jika perlu
-        primaryStageStatic.show();
+        
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Register - Disaster Management System");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public static void showDashboardView() throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/com/DashboardView.fxml"));
-        Parent root = loader.load();
-        DashboardController controller = loader.getController();
-        controller.initData("user@example.com"); // You can pass actual user email here
-
-        primaryStageStatic.setScene(new Scene(root, 1000, 700));
-        primaryStageStatic.show();
-    }
-
-    // Method for LaporanBencanaData
-    public static void showDetailLaporan(LaporanBencanaData laporan) throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/com/DetailLaporanView.fxml"));
-        Parent root = loader.load();
-        DetailLaporanController controller = loader.getController();
-        controller.initData(laporan);
-
-        primaryStageStatic.setScene(new Scene(root, 900, 700));
-        primaryStageStatic.show();
-    }
-
-    // Overloaded method for Bencana
-    public static void showDetailLaporan(Bencana bencana) throws IOException {
-        // Convert Bencana to LaporanBencanaData
-        LaporanBencanaData laporan = new LaporanBencanaData(
-            bencana.getJudul(), // jenisBencana
-            bencana.getLokasi(), // lokasi
-            bencana.getDeskripsiSingkat(), // deskripsi
-            "Sedang", // tingkatKeparahan (default)
-            "0" // jumlahKorban (default)
-        );
+        System.out.println("DEBUG: Loading DashboardView...");
+        URL fxmlLocation = Main.class.getResource("/com/DashboardView.fxml");
+        if (fxmlLocation == null) {
+            System.err.println("ERROR: DashboardView.fxml not found! Trying alternative path...");
+            fxmlLocation = Main.class.getResource("DashboardView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("ERROR: DashboardView.fxml not found in any location!");
+                return;
+            }
+        }
         
-        showDetailLaporan(laporan);
-    }
-
-    public static void showLaporanList() throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/com/LaporanListView.fxml"));
+        System.out.println("DEBUG: Found DashboardView.fxml at: " + fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Parent root = loader.load();
-        LaporanListController controller = loader.getController();
-        controller.initData("user@example.com");
-
-        primaryStageStatic.setScene(new Scene(root, 1000, 700));
-        primaryStageStatic.show();
+        
+        DashboardController controller = loader.getController();
+        if (controller != null) {
+            controller.initData("user@example.com");
+        }
+        
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Dashboard - Disaster Management System");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public static void showBuatLaporan() throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/com/BuatLaporanView.fxml"));
+        System.out.println("DEBUG: Loading BuatLaporan form...");
+        URL fxmlLocation = Main.class.getResource("/com/BuatLaporanView.fxml");
+        if (fxmlLocation == null) {
+            System.err.println("ERROR: BuatLaporanView.fxml not found! Trying alternative path...");
+            fxmlLocation = Main.class.getResource("BuatLaporanView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("ERROR: BuatLaporanView.fxml not found in any location!");
+                return;
+            }
+        }
+        
+        System.out.println("DEBUG: Found BuatLaporanView.fxml at: " + fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Parent root = loader.load();
+        
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Buat Laporan Bencana - Disaster Management System");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
 
-        primaryStageStatic.setScene(new Scene(root, 900, 800));
-        primaryStageStatic.show();
+    public static void showDetailLaporan(Object laporan) throws IOException {
+        System.out.println("DEBUG: Loading DetailLaporan...");
+        URL fxmlLocation = Main.class.getResource("/com/DetailLaporanView.fxml");
+        if (fxmlLocation == null) {
+            System.err.println("ERROR: DetailLaporanView.fxml not found! Trying alternative path...");
+            fxmlLocation = Main.class.getResource("DetailLaporanView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("ERROR: DetailLaporanView.fxml not found in any location!");
+                return;
+            }
+        }
+        
+        System.out.println("DEBUG: Found DetailLaporanView.fxml at: " + fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        Parent root = loader.load();
+        
+        DetailLaporanController controller = loader.getController();
+        if (controller != null && laporan != null) {
+            if (laporan instanceof Bencana) {
+                // Convert Bencana to LaporanBencanaData if needed
+                Bencana bencana = (Bencana) laporan;
+                LaporanBencanaData laporanData = new LaporanBencanaData(
+                    bencana.getJudul(),
+                    bencana.getLokasi(),
+                    bencana.getDeskripsiSingkat(),
+                    "Sedang", // default tingkat keparahan
+                    "0" // default jumlah korban
+                );
+                controller.initData(laporanData);
+            } else if (laporan instanceof LaporanBencanaData) {
+                controller.initData((LaporanBencanaData) laporan);
+            }
+        }
+        
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Detail Laporan - Disaster Management System");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void showLaporanList() throws IOException {
+        System.out.println("DEBUG: Loading LaporanList...");
+        URL fxmlLocation = Main.class.getResource("/com/LaporanListView.fxml");
+        if (fxmlLocation == null) {
+            System.err.println("ERROR: LaporanListView.fxml not found! Trying alternative path...");
+            fxmlLocation = Main.class.getResource("LaporanListView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("ERROR: LaporanListView.fxml not found in any location!");
+                return;
+            }
+        }
+        
+        System.out.println("DEBUG: Found LaporanListView.fxml at: " + fxmlLocation);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
+        Parent root = loader.load();
+        
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Daftar Laporan - Disaster Management System");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
-        // DataManager.deleteDataFiles(); // <-- Anda bisa uncomment ini untuk menghapus semua data (termasuk user) untuk fresh start
         launch(args);
     }
 }

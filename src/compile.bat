@@ -2,7 +2,7 @@
 setlocal
 
 REM Path ke folder lib JavaFX kamu
-set JAVAFX_LIB=C:\JavaFX\javafx-sdk-24.0.1\lib
+set JAVAFX_LIB=C:\Users\Olivia CL\Downloads\openjfx-21.0.7_windows-x64_bin-sdk\javafx-sdk-21.0.7\lib
 set JUNIT_JAR="lib\junit-platform-console-standalone-1.13.0-M3.jar"
 
 echo.
@@ -32,7 +32,7 @@ echo.
 REM Compile all .java files
 javac --module-path "%JAVAFX_LIB%" ^
 --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.media ^
--cp "%JUNIT_JAR%;src" -d bin src\com\*.java tests\*.java
+-cp "%JUNIT_JAR%;src" -d bin com\*.java tests\*.java
 
 if errorlevel 1 (
     echo ❌ Compile error.
@@ -61,8 +61,8 @@ java -version
 echo.
 
 REM ✅ Copy FXML to bin (biarkan)
-xcopy /Y /S /I src\com\*.fxml bin\com\
-xcopy /Y /S /I src\com\*.css bin\com\
+xcopy /Y /S /I com\*.fxml bin\com\
+xcopy /Y /S /I com\*.css bin\com\
 
 
 REM ✅ ✅ ✅ FIXED: Run with correct classpath (was: -cp src)

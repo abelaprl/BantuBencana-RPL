@@ -1,60 +1,139 @@
 package com;
-// src/BencanaRepository.java
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File; // <--- TAMBAHKAN BARIS INI
 
 public class BencanaRepository {
-    // Path ke file teks yang berisi data bencana
-    private static final String FILE_PATH = "../bencana.txt";
+    private static final String DATA_FILE = "bencana_data.txt";
+    private List<Bencana> bencanaList;
+
+    public BencanaRepository() {
+        this.bencanaList = new ArrayList<>();
+        loadFromFile();
+        
+        // Jika file kosong atau tidak ada, inisialisasi dengan data dummy
+        if (bencanaList.isEmpty()) {
+            initializeDummyData();
+        }
+    }
 
     public List<Bencana> findAll() {
-        List<Bencana> bencanas = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+        return new ArrayList<>(bencanaList);
+    }
+
+    public void save(Bencana bencana) {
+        if (bencana != null) {
+            bencanaList.add(bencana);
+            saveToFile();
+        }
+    }
+
+    public void update(int index, Bencana bencana) {
+        if (index >= 0 && index < bencanaList.size() && bencana != null) {
+            bencanaList.set(index, bencana);
+            saveToFile();
+        }
+    }
+
+    public void delete(int index) {
+        if (index >= 0 && index < bencanaList.size()) {
+            bencanaList.remove(index);
+            saveToFile();
+        }
+    }
+
+    private void loadFromFile() {
+        File file = new File(DATA_FILE);
+        if (!file.exists()) {
+            System.out.println("DEBUG: File bencana data tidak ditemukan. Akan dibuat saat menyimpan.");
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                Bencana bencana = Bencana.fromString(line);
-                if (bencana != null) {
-                    bencanas.add(bencana);
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error membaca file bencana: " + e.getMessage());
-            System.out.println("Mencoba membuat file dummy bencana.txt...");
-            createDummyDataFile(); // Buat file jika belum ada dengan beberapa data dummy
-            // Setelah membuat dummy data, coba baca lagi
-            try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
                     Bencana bencana = Bencana.fromString(line);
                     if (bencana != null) {
-                        bencanas.add(bencana);
+                        bencanaList.add(bencana);
                     }
                 }
-            } catch (IOException ex) {
-                System.err.println("Error membaca file bencana setelah membuat dummy: " + ex.getMessage());
             }
-        }
-        return bencanas;
-    }
-
-    // Metode untuk membuat file bencana.txt dengan data dummy
-    private void createDummyDataFile() {
-        try (java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(FILE_PATH))) {
-            writer.write("Gempa Lombok|Nusa Tenggara Barat|Gempa bumi berkekuatan 6.4 SR mengguncang Lombok.|2018-07-29|bencana_lombok.jpg\n");
-            writer.write("Banjir Jakarta|DKI Jakarta|Banjir besar melanda beberapa wilayah ibu kota.|2020-01-01|bencana_jakarta.jpg\n");
-            writer.write("Erupsi Gunung Semeru|Jawa Timur|Gunung Semeru erupsi mengeluarkan awan panas guguran.|2021-12-04|bencana_semeru.jpg\n");
-            writer.write("Tsunami Aceh|Aceh|Tsunami dahsyat meluluhlantakkan pesisir Aceh.|2004-12-26|bencana_aceh.jpg\n");
-            writer.write("Kebakaran Hutan Kalimantan|Kalimantan Tengah|Kebakaran hutan dan lahan menyebabkan kabut asap pekat.|2019-09-01|bencana_kalimantan.jpg\n");
-            System.out.println("File bencana.txt dengan data dummy berhasil dibuat di: " + new File(FILE_PATH).getAbsolutePath());
+            System.out.println("DEBUG: Berhasil memuat " + bencanaList.size() + " data bencana dari file.");
         } catch (IOException e) {
-            System.err.println("Error membuat file dummy bencana: " + e.getMessage());
+            System.err.println("Error membaca file bencana: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    // Anda bisa menambahkan metode save(Bencana) atau saveAll(List<Bencana>)
-    // jika ingin fitur menambah/mengedit bencana dari aplikasi.
+    private void saveToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE))) {
+            for (Bencana bencana : bencanaList) {
+                writer.write(bencana.toString());
+                writer.newLine();
+            }
+            System.out.println("DEBUG: Berhasil menyimpan " + bencanaList.size() + " data bencana ke file.");
+        } catch (IOException e) {
+            System.err.println("Error menyimpan file bencana: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void initializeDummyData() {
+        System.out.println("DEBUG: Menginisialisasi data dummy bencana...");
+        
+        // Data dummy dengan gambar
+        Bencana bencana1 = new Bencana(
+            "Banjir Jakarta Selatan", 
+            "Jakarta Selatan", 
+            "2024-01-15", 
+            "Banjir besar melanda Jakarta Selatan akibat hujan deras selama 3 hari berturut-turut.",
+            "jakarta_banjir.jpg"
+        );
+        bencana1.addGambar("jakarta_banjir_1.jpg");
+        bencana1.addGambar("jakarta_banjir_2.jpg");
+        
+        Bencana bencana2 = new Bencana(
+            "Gempa Lombok", 
+            "Lombok, NTB", 
+            "2024-01-10", 
+            "Gempa berkekuatan 5.2 SR mengguncang Lombok pada pagi hari.",
+            "lombok_gempa.jpg"
+        );
+        bencana2.addGambar("lombok_gempa_1.jpg");
+        
+        Bencana bencana3 = new Bencana(
+            "Kebakaran Hutan Riau", 
+            "Riau", 
+            "2024-01-08", 
+            "Kebakaran hutan dan lahan di Riau menyebabkan kabut asap tebal.",
+            "riau_kebakaran.jpg"
+        );
+        bencana3.addGambar("riau_kebakaran_1.jpg");
+        bencana3.addVideo("riau_kebakaran_video.mp4");
+
+        bencanaList.add(bencana1);
+        bencanaList.add(bencana2);
+        bencanaList.add(bencana3);
+        
+        saveToFile();
+        System.out.println("DEBUG: Data dummy bencana berhasil diinisialisasi.");
+    }
+
+    public Bencana findById(int index) {
+        if (index >= 0 && index < bencanaList.size()) {
+            return bencanaList.get(index);
+        }
+        return null;
+    }
+
+    public int size() {
+        return bencanaList.size();
+    }
+
+    public void clear() {
+        bencanaList.clear();
+        saveToFile();
+    }
 }

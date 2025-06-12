@@ -1,0 +1,3 @@
+Banjir Jakarta Selatan|Jakarta Selatan|2024-01-15|Banjir besar melanda Jakarta Selatan akibat hujan deras selama 3 hari berturut-turut.|jakarta_banjir.jpg|jakarta_banjir_1.jpg,jakarta_banjir_2.jpg|
+Gempa Lombok|Lombok, NTB|2024-01-10|Gempa berkekuatan 5.2 SR mengguncang Lombok pada pagi hari.|lombok_gempa.jpg|lombok_gempa_1.jpg|
+Kebakaran Hutan Riau|Riau|2024-01-08|Kebakaran hutan dan lahan di Riau menyebabkan kabut asap tebal.|riau_kebakaran.jpg|riau_kebakaran_1.jpg|riau_kebakaran_video.mp4

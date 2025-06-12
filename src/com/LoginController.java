@@ -1,71 +1,95 @@
 package com;
-// File: src/LoginController.java
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import javafx.scene.Node;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class LoginController {
+public class LoginController implements Initializable {
 
     @FXML
-    private TextField usernameField; // Meskipun namanya usernameField, ini akan digunakan untuk email
+    private TextField emailField;
     @FXML
     private PasswordField passwordField;
     @FXML
-    private Label errorMessageLabel;
+    private Button loginButton;
+    @FXML
+    private Button registerButton;
 
-    private Stage primaryStage;
+    private UserRepository userRepository = new UserRepository();
 
-    public void setPrimaryStage(Stage stage) {
-        this.primaryStage = stage;
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        System.out.println("DEBUG: LoginController initialized");
+        
+        // Check if there's a previous session
+        UserSessionManager.loadSession();
+        if (UserSessionManager.isLoggedIn()) {
+            System.out.println("DEBUG: Previous session found for: " + UserSessionManager.getCurrentUserEmail());
+            // Optionally auto-login or show a message
+            emailField.setText(UserSessionManager.getCurrentUserEmail());
+        }
     }
 
     @FXML
-    public void handleLogin(ActionEvent event) {
-        String email = usernameField.getText(); // Ambil input sebagai email
+    private void handleLogin(ActionEvent event) {
+        String email = emailField.getText().trim();
         String password = passwordField.getText();
 
-        UserRepository userRepository = new UserRepository();
-        // Ubah ini untuk mencari user berdasarkan email
-        User user = userRepository.authenticateByEmail(email, password);
+        System.out.println("DEBUG: Login attempt for email: " + email);
 
-        if (user != null) {
-            errorMessageLabel.setText("");
-            System.out.println("Login Sukses untuk pengguna: " + user.getUsername() + " (" + user.getEmail() + ")");
+        if (email.isEmpty() || password.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Email dan password harus diisi!");
+            return;
+        }
 
-            if (primaryStage != null) {
-                ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
-
-                try {
-                    Dashboard dashboard = new Dashboard();
-                    dashboard.start(new Stage(), user.getEmail());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.err.println("Error starting dashboard: " + e.getMessage());
-                }
+        try {
+            if (userRepository.authenticate(email, password)) {
+                System.out.println("DEBUG: Login successful for: " + email);
+                
+                // Save user session
+                UserSessionManager.saveSession(email);
+                
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Login berhasil! Selamat datang " + 
+                    UserSessionManager.getCurrentUser().getName());
+                
+                // Navigate to dashboard
+                Main.showDashboardView();
+            } else {
+                System.out.println("DEBUG: Login failed for: " + email);
+                showAlert(Alert.AlertType.ERROR, "Error", "Email atau password salah!");
             }
-
-        } else {
-            errorMessageLabel.setText("Email atau password salah!"); // Ubah pesan error
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("ERROR: Failed to navigate to dashboard");
+            showAlert(Alert.AlertType.ERROR, "Error", "Terjadi kesalahan sistem!");
         }
     }
 
     @FXML
-    private void handleRegisterLink(ActionEvent event) {
-        System.out.println("Navigasi ke halaman registrasi.");
-        if (primaryStage != null) {
-            ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
-            try {
-                Main.showRegisterView();
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Error navigating to register view: " + e.getMessage());
-            }
+    private void handleRegister(ActionEvent event) {
+        try {
+            System.out.println("DEBUG: Navigating to register view");
+            Main.showRegisterView();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("ERROR: Failed to navigate to register view");
+            showAlert(Alert.AlertType.ERROR, "Error", "Tidak dapat membuka halaman registrasi!");
         }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

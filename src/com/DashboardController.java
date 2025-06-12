@@ -35,13 +35,26 @@ public class DashboardController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Initialization logic, if any
+        // Load current user from session
+        if (UserSessionManager.isLoggedIn()) {
+            User currentUser = UserSessionManager.getCurrentUser();
+            if (currentUser != null && userEmailLabel != null) {
+                userEmailLabel.setText("Selamat datang, " + currentUser.getName() + " (" + currentUser.getEmail() + ")");
+                this.loggedInUserEmail = currentUser.getEmail();
+            }
+        }
+        loadBencanaData();
     }
 
     public void initData(String email) {
         this.loggedInUserEmail = email;
         if (userEmailLabel != null) {
-            userEmailLabel.setText(email);
+            User user = new UserRepository().findByEmail(email);
+            if (user != null) {
+                userEmailLabel.setText("Selamat datang, " + user.getName() + " (" + email + ")");
+            } else {
+                userEmailLabel.setText(email);
+            }
         }
         System.out.println("DEBUG: User " + email + " logged in. Loading dashboard data.");
         loadBencanaData();
@@ -73,44 +86,9 @@ public class DashboardController implements Initializable {
         card.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #cccccc; -fx-border-width: 1px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
         card.setMaxWidth(600);
 
-        ImageView imageView = new ImageView();
-
         System.out.println("\n--- Memproses Bencana: " + bencana.getJudul() + " ---");
-        String namaFileGambarDariObjek = bencana.getNamaFileGambar();
-        System.out.println("DEBUG: Nama file gambar dari objek Bencana: '" + namaFileGambarDariObjek + "'");
 
-        String relativePathForImage = "img/bencana_photos/" + namaFileGambarDariObjek;
-        // String relativePathForImage = namaFileGambarDariObjek;
-        System.out.println("DEBUG: Path relatif yang dicoba untuk gambar: '" + relativePathForImage + "'");
-
-        File file = new File("img/bencana_photos/" + namaFileGambarDariObjek);
-        if (file.exists()) {
-            System.out.println("DEBUG: Load gambar dari file system langsung.");
-            Image image = new Image(file.toURI().toString());
-            if (image.isError()) {
-                System.err.println("ERROR: Gambar gagal dimuat: " + image.getException());
-                Label errorLabel = new Label("Gambar rusak atau tidak dapat dimuat: " + namaFileGambarDariObjek);
-                errorLabel.setTextFill(Color.RED);
-                errorLabel.setFont(new Font(12));
-                imageView.setFitWidth(570);
-                imageView.setFitHeight(100);
-                card.getChildren().add(errorLabel);
-            } else {
-                imageView.setImage(image);
-                imageView.setFitWidth(570);
-                imageView.setFitHeight(200);
-                imageView.setPreserveRatio(false);
-            }
-        } else {
-            System.err.println("ERROR: Gambar tidak ditemukan di lokasi: " + file.getAbsolutePath());
-            Label errorLabel = new Label("Gambar tidak ditemukan: " + namaFileGambarDariObjek);
-            errorLabel.setTextFill(Color.RED);
-            errorLabel.setFont(new Font(12));
-            imageView.setFitWidth(570);
-            imageView.setFitHeight(100);
-            card.getChildren().add(errorLabel);
-        }
-
+        // Tambahkan label informasi tanpa gambar
         Label judulLabel = new Label(bencana.getJudul());
         judulLabel.setFont(new Font("System Bold", 18));
         judulLabel.setWrapText(true);
@@ -129,26 +107,18 @@ public class DashboardController implements Initializable {
         Button detailButton = new Button("Lihat Detail");
         detailButton.setOnAction(e -> {
             try {
-                Main.showDetailLaporan(bencana); // Memanggil Main.showDetailLaporan dengan objek Bencana
+                Main.showDetailLaporan(bencana);
                 System.out.println("DEBUG: Membuka detail laporan untuk: " + bencana.getJudul());
-            } catch (IOException ex) { // Tangkap IOException
+            } catch (IOException ex) {
                 ex.printStackTrace();
                 System.err.println("ERROR: Gagal membuka detail laporan.");
             }
         });
-        Button donasiButton = new Button("Donasi");
-        donasiButton.setOnAction(e -> {
-            try {
-                new DonationPage(loggedInUserEmail).start(new Stage());
-                System.out.println("DEBUG: Membuka halaman Donasi untuk: " + bencana.getJudul());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.err.println("ERROR: Gagal membuka halaman donasi dari card.");
-            }
-        });
-        buttonBox.getChildren().addAll(detailButton, donasiButton);
+        
+        // Tombol donasi dihilangkan sesuai request
+        buttonBox.getChildren().add(detailButton);
 
-        card.getChildren().addAll(imageView, judulLabel, lokasiLabel, tanggalLabel, deskripsiLabel, buttonBox);
+        card.getChildren().addAll(judulLabel, lokasiLabel, tanggalLabel, deskripsiLabel, buttonBox);
 
         return card;
     }
@@ -156,8 +126,12 @@ public class DashboardController implements Initializable {
     @FXML
     private void handleLogout(ActionEvent event) {
         try {
-            System.out.println("DEBUG: Logging out and returning to LoginView.");
-            // Menggunakan Main.showLoginView() yang sudah didefinisikan di kelas Main Anda
+            System.out.println("DEBUG: Logging out user: " + loggedInUserEmail);
+            
+            // Clear user session
+            UserSessionManager.clearSession();
+            
+            // Navigate back to login
             Main.showLoginView();
         } catch (IOException e) {
             e.printStackTrace();
@@ -180,7 +154,8 @@ public class DashboardController implements Initializable {
     private void handleFeedback(ActionEvent event) {
         try {
             System.out.println("DEBUG: Navigating to Feedback form.");
-            new Feedback().start(new Stage(), loggedInUserEmail);
+            String currentEmail = UserSessionManager.getCurrentUserEmail();
+            new Feedback().start(new Stage(), currentEmail != null ? currentEmail : loggedInUserEmail);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("ERROR: Gagal membuka halaman feedback.");
@@ -191,7 +166,8 @@ public class DashboardController implements Initializable {
     private void handleDonasi(ActionEvent event) {
         try {
             System.out.println("DEBUG: Navigating to Donation page.");
-            new DonationPage(loggedInUserEmail).start(new Stage());
+            String currentEmail = UserSessionManager.getCurrentUserEmail();
+            new DonationPage(currentEmail != null ? currentEmail : loggedInUserEmail).start(new Stage());
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("ERROR: Gagal membuka halaman donasi.");
@@ -208,5 +184,4 @@ public class DashboardController implements Initializable {
             System.err.println("ERROR: Gagal membuka halaman daftar laporan.");
         }
     }
-
 }

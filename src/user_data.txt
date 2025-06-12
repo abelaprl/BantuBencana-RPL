@@ -1,0 +1,4 @@
+Admin|admin@example.com|admin123
+User Test|user@example.com|user123
+coba|coba@coba.com|cobacoba
+cape|cape@cape.com|capecape

@@ -10,12 +10,9 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.util.List;
-import javafx.scene.Node; // Import Node
 
 public class Feedback extends Application {
 
@@ -25,7 +22,6 @@ public class Feedback extends Application {
     private ComboBox<String> lokasiLaporan;
     private TextArea[] feedbackAreas;
     private TextArea evaluasiText;
-    private Label fileLabel;
     
     private String currentUserEmail;
 
@@ -226,78 +222,6 @@ public class Feedback extends Application {
         
         evaluasiSection.getChildren().addAll(evaluasiLabel, evaluasiText);
 
-        // Upload section
-        VBox uploadSection = new VBox(10);
-        Label uploadLabel = new Label("📎 Media Pendukung");
-        uploadLabel.setStyle(labelStyle);
-        
-        Button uploadButton = new Button("📁 Pilih File");
-        uploadButton.setStyle("-fx-background-color: #e3f2fd; " +
-                             "-fx-text-fill: #1565c0; " +
-                             "-fx-border-color: #42a5f5; " +
-                             "-fx-border-width: 1.5; " +
-                             "-fx-border-radius: 8; " +
-                             "-fx-background-radius: 8; " +
-                             "-fx-padding: 10 20; " +
-                             "-fx-font-family: 'Segoe UI'; " +
-                             "-fx-font-size: 13px; " +
-                             "-fx-cursor: hand;");
-        uploadButton.setOnMouseEntered(e -> 
-            uploadButton.setStyle("-fx-background-color: #bbdefb; " +
-                                 "-fx-text-fill: #1565c0; " +
-                                 "-fx-border-color: #1976d2; " +
-                                 "-fx-border-width: 1.5; " +
-                                 "-fx-border-radius: 8; " +
-                                 "-fx-background-radius: 8; " +
-                                 "-fx-padding: 10 20; " +
-                                 "-fx-font-family: 'Segoe UI'; " +
-                                 "-fx-font-size: 13px; " +
-                                 "-fx-cursor: hand;"));
-        uploadButton.setOnMouseExited(e -> 
-            uploadButton.setStyle("-fx-background-color: #e3f2fd; " +
-                                 "-fx-text-fill: #1565c0; " +
-                                 "-fx-border-color: #42a5f5; " +
-                                 "-fx-border-width: 1.5; " +
-                                 "-fx-border-radius: 8; " +
-                                 "-fx-background-radius: 8; " +
-                                 "-fx-padding: 10 20; " +
-                                 "-fx-font-family: 'Segoe UI'; " +
-                                 "-fx-font-size: 13px; " +
-                                 "-fx-cursor: hand;"));
-        
-        fileLabel = new Label("Tidak ada file dipilih");
-        fileLabel.setStyle("-fx-font-family: 'Segoe UI'; " +
-                          "-fx-font-size: 12px; " +
-                          "-fx-text-fill: #666;");
-        
-        uploadButton.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Pilih Media Pendukung");
-            fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif"),
-                new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mov"),
-                new FileChooser.ExtensionFilter("All Files", "*.*")
-            );
-            File selectedFile = fileChooser.showOpenDialog(primaryStage);
-            if (selectedFile != null) {
-                currentFeedback.setMediaPendukungPath(selectedFile.getAbsolutePath());
-                fileLabel.setText("📄 " + selectedFile.getName());
-                fileLabel.setStyle("-fx-font-family: 'Segoe UI'; " +
-                                  "-fx-font-size: 12px; " +
-                                  "-fx-text-fill: #1565c0;");
-            } else {
-                currentFeedback.setMediaPendukungPath(null);
-                fileLabel.setText("Tidak ada file dipilih");
-                fileLabel.setStyle("-fx-font-family: 'Segoe UI'; " +
-                                  "-fx-font-size: 12px; " +
-                                  "-fx-text-fill: #666;");
-            }
-        });
-        
-        HBox uploadBox = new HBox(15, uploadButton, fileLabel);
-        uploadBox.setAlignment(Pos.CENTER_LEFT);
-        uploadSection.getChildren().addAll(uploadLabel, uploadBox);
-
         // Submit button
         Button submitButton = new Button("✨ Kirim Feedback");
         submitButton.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
@@ -345,7 +269,6 @@ public class Feedback extends Application {
             dropdownSection,
             ratingsContainer,
             evaluasiSection,
-            uploadSection,
             submitBox
         );
 
